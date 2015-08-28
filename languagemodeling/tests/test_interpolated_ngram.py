@@ -1,4 +1,4 @@
-# https://docs.python.org/3/library/unittest.html
+"""# https://docs.python.org/3/library/unittest.html
 from unittest import TestCase
 from math import log
 
@@ -57,3 +57,4 @@ class TestInterpolatedNGram(TestCase):
         }
         for (token, prev), p in probs.items():
             self.assertEqual(model.cond_prob(token, [prev]), p, (token))
+"""
