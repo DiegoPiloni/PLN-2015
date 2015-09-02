@@ -1,12 +1,13 @@
 """Train an n-gram model.
 
 Usage:
-  train.py -n <n> -o <file>
+  train.py -n <n> -m <file> [-g <file>]
   train.py -h | --help
 
 Options:
   -n <n>        Order of the model.
-  -o <file>     Output model file.
+  -m <file>     Output model file.
+  -g <file>     (Optional) Output generator file.
   -h --help     Show this screen.
 """
 from docopt import docopt
@@ -14,7 +15,7 @@ import pickle
 
 from nltk.corpus import gutenberg
 
-from languagemodeling.ngram import NGram
+from languagemodeling.ngram import NGram, NGramGenerator
 
 
 if __name__ == '__main__':
@@ -27,8 +28,18 @@ if __name__ == '__main__':
     n = int(opts['-n'])
     model = NGram(n, sents)
 
-    # save it
-    filename = opts['-o']
+    # save the model
+    filename = opts['-m']
     f = open(filename, 'wb')
     pickle.dump(model, f)
     f.close()
+
+    # train generator (optional)
+    if opts['-g']:
+        generator = NGramGenerator(model)
+
+        # save generator
+        filename = opts['-g']
+        f = open(filename, 'wb')
+        pickle.dump(generator, f)
+        f.close()

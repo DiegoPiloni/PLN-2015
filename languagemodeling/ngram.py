@@ -3,6 +3,7 @@ from collections import defaultdict
 from math import log
 import random
 
+
 class NGram(object):
 
     def __init__(self, n, sents):
@@ -68,5 +69,59 @@ class NGram(object):
         return log_p
 
 
+class NGramGenerator(object):
 
+    def __init__(self, model):
+        """
+        model -- n-gram model.
+        """
+        self.n = model.n
+        self.probs = defaultdict(dict)
+        self.sorted_probs = {}
 
+        n = model.n
+        d = model.counts
+
+        # self.probs
+        for (g, _) in d.items():
+            if len(g) == n:
+                self.probs[g[:-1]][g[-1]] = model.cond_prob(g[-1], list(g[:-1]))
+
+        # self.sorted_probs
+        self.sorted_probs = self.probs.copy()
+        for (x, y) in self.sorted_probs.items():
+            l = list(y.items())
+            l.sort(key=lambda x: ((-1) * x[1], x[0]))
+            self.sorted_probs[x] = l
+
+    def generate_sent(self):
+        """Randomly generate a sentence."""
+        n = self.n
+        sentence = []
+        token = ""
+        prev_tokens = ('<s>',) * (n-1)
+        while 1:
+            token = self.generate_token(prev_tokens)
+            if token == '</s>':
+                break
+            sentence.append(token)
+            prev_tokens = (prev_tokens + (token,))[1:]
+        return sentence
+
+    def generate_token(self, prev_tokens=None):
+        """Randomly generate a token, given prev_tokens.
+        prev_tokens -- the previous n-1 tokens (optional only if n = 1).
+        """
+        n = self.n
+        if not prev_tokens:
+            prev_tokens = ()
+        assert len(prev_tokens) == n-1
+
+        sorted_probs = self.sorted_probs[tuple(prev_tokens)]
+        x = 0
+        u = random.random()
+        F = sorted_probs[x][1]
+        while u > F:
+            x += 1
+            F += sorted_probs[x][1]
+        return sorted_probs[x][0]
