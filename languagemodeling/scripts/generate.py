@@ -1,13 +1,12 @@
 """Generate sentences from an n-gram model.
 
 Usage:
-  generate.py -s <n> -i <file> -o <file>
+  generate.py -s <n> -i <file>
   generate.py -h | --help
 
 Options:
   -s <n>        Amount of sentences.
   -i <file>     Input generator trained file.
-  -o <file>     Output model file.
   -h --help     Show this screen.
 """
 from docopt import docopt
@@ -26,12 +25,10 @@ if __name__ == '__main__':
 
     a_s = int(opts['-s'])
     gen_sents = ""
-    for _ in range(a_s):
+    for i in range(a_s):
         gen_sent = ngramGen.generate_sent()
-        gen_sents += (" ".join(gen_sent) + '\n')
+        gen_sents += (" ".join(gen_sent))
+        if i != a_s - 1:
+            gen_sents += '\n'
 
-    # save the sentences
-    output_filename = opts['-o']
-    f = open(output_filename, 'w')
-    f.write(gen_sents)
-    f.close()
+    print(gen_sents)
