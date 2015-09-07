@@ -17,15 +17,16 @@ Options:
 from docopt import docopt
 import pickle
 from nltk.corpus import gutenberg, PlaintextCorpusReader
-from languagemodeling.ngram import NGram, AddOneNGram, NGramGenerator
+from languagemodeling.ngram import NGram, AddOneNGram
 
 
 if __name__ == '__main__':
     opts = docopt(__doc__)
 
     # load the data
-    my_corpus = PlaintextCorpusReader('../corpus/', '.*\.txt')
-    sents = my_corpus.sents()
+    # my_corpus = PlaintextCorpusReader('../corpus/', ['CanciondeHieloyFuego.txt'])
+    sents = gutenberg.sents('austen-emma.txt')
+    sents = sents[:int(90*len(sents)/100)]
 
     # train the model
     n = int(opts['-n'])

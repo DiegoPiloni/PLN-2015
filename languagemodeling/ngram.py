@@ -68,38 +68,38 @@ class NGram(object):
             log_p = log(p, 2)
         return log_p
 
+    def cross_entropy(self, sents, M):
+        """ Cross-entropy of the model.
+        sents -- the test sentences as a list of tokens.
+        M -- Total number of words in test data.
+        """
+        l = 0
+        for sent in sents:
+            l += self.sent_log_prob(sent)
+        return (-l/M)
 
-class AddOneNGram(object):
+    def perplexity(self, sents, M):
+        """ Perplexity of the model.
+        sents -- the test sentences as a list of tokens
+        M -- Total number of words in test data
+        """
+        c_ent = self.cross_entropy(sents, M)
+        return 2 ** c_ent
+
+
+
+class AddOneNGram(NGram):
 
     def __init__(self, n, sents):
         """
         n -- order of the model.
         sents -- list of sentences, each one being a list of tokens.
         """
-        assert n > 0
-        self.n = n
-        self.counts = counts = defaultdict(int)
-        self.vocab = []
-        self.len_vocab = 0
-
-        for sent in sents:
-            sent = ['<s>']*(n-1) + sent + ['</s>']
-            for i in range(len(sent) - n + 1):
-                ngram = tuple(sent[i: i + n])
-                self.vocab += [w for w in ngram if w != '<s>']
-                counts[ngram] += 1
-                counts[ngram[:-1]] += 1
-        self.vocab = list(set(self.vocab))
-        self.len_vocab = len(self.vocab)
-
-    def count(self, tokens):
-        """Count for an n-gram or (n-1)-gram.
-        tokens -- the n-gram or (n-1)-gram tuple.
-        """
-        n = self.n
-        l_t = len(tokens)
-        assert l_t == n or l_t == (n-1)
-        return self.counts[tuple(tokens)]
+        super(AddOneNGram, self).__init__(n, sents)
+        vocab = []
+        for g in self.counts.keys():
+            vocab += [w for w in g if w != '<s>']
+        self.len_vocab = len(set(vocab))
 
     def cond_prob(self, token, prev_tokens=None):
         """Conditional probability of a token.
@@ -116,8 +116,7 @@ class AddOneNGram(object):
         return (count_ngram + 1) / (count_n_1gram + self.V())
 
     def V(self):
-        """Size of the vocabulary.
-        """
+        """Size of the vocabulary."""
         return self.len_vocab
 
 
