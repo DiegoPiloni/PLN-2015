@@ -74,6 +74,7 @@ class TestInterpolatedNGram(TestCase):
     def test_cond_prob_2gram_no_addone(self):
         gamma = 1.0
         model = InterpolatedNGram(2, self.sents, gamma, addone=False)
+        print (model.lambdas(('come',)))
 
         c1 = 2.0  # count for 'come' (and '.')
         l1 = c1 / (c1 + gamma)

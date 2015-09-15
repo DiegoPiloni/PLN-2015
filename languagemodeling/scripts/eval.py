@@ -28,8 +28,8 @@ if __name__ == '__main__':
     # test_data = PlaintextCorpusReader('../corpus/', ['test.txt'])
     # sents = test_data.sents()
     sents = gutenberg.sents('austen-emma.txt')
-    sents = sents[int(90*len(sents)/ 100):]
-    sents = [s for s in sents if len(s) <= 30] # very long sentences give -inf prob.
+    sents = sents[int(90*len(sents)/100):]
+    #sents = sents[int(90*len(sents)/ 100):]
     num_words = 0
     for sent in sents:
         num_words += len(sent)

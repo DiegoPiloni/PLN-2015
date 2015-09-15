@@ -10,6 +10,7 @@ Options:
   -m <model>    Model to use [default: ngram]:
                   ngram: Unsmoothed n-grams.
                   addone: N-grams with add-one smoothing.
+                  interpolated: N-grams with linear interpolation smoothing.
   -o <file>     Output model file.
   -g <file>     Output generator file.
   -h --help     Show this screen.
@@ -17,25 +18,29 @@ Options:
 from docopt import docopt
 import pickle
 from nltk.corpus import gutenberg, PlaintextCorpusReader
-from languagemodeling.ngram import NGram, AddOneNGram
+from languagemodeling.ngram import NGram, AddOneNGram, InterpolatedNGram
 
 
 if __name__ == '__main__':
     opts = docopt(__doc__)
 
     # load the data
-    # my_corpus = PlaintextCorpusReader('../corpus/', ['CanciondeHieloyFuego.txt'])
     sents = gutenberg.sents('austen-emma.txt')
     sents = sents[:int(90*len(sents)/100)]
 
     # train the model
     n = int(opts['-n'])
-    m = (opts['-m'])
+    m = (opts['-m']).lower()
 
-    if m != "addone":
-        model = NGram(n, sents)
+    if m == "addone":
+      model = AddOneNGram(n, sents)
+    elif m == "interpolated":
+        if n == 1:
+          model = InterpolatedNGram(n, sents)
+        else:
+          model = InterpolatedNGram(n, sents, addone = True) # qe hacer!?
     else:
-        model = AddOneNGram(n, sents)
+        model = NGram(n, sents)
 
     # save the model
     filename = opts['-o']
