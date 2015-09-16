@@ -29,10 +29,7 @@ if __name__ == '__main__':
     # sents = test_data.sents()
     sents = gutenberg.sents('austen-emma.txt')
     sents = sents[int(90*len(sents)/100):]
-    #sents = sents[int(90*len(sents)/ 100):]
-    num_words = 0
-    for sent in sents:
-        num_words += len(sent)
+    # sents = sents[int(90*len(sents)/ 100):]
 
-    perplexity = model.perplexity(sents, num_words)
+    perplexity = model.perplexity(sents)
     print(perplexity)

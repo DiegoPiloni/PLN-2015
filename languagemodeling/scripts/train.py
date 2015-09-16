@@ -18,7 +18,7 @@ Options:
 from docopt import docopt
 import pickle
 from nltk.corpus import gutenberg, PlaintextCorpusReader
-from languagemodeling.ngram import NGram, AddOneNGram, InterpolatedNGram
+from languagemodeling.ngram import NGram, AddOneNGram, InterpolatedNGram, NGramGenerator
 
 
 if __name__ == '__main__':
@@ -33,12 +33,12 @@ if __name__ == '__main__':
     m = (opts['-m']).lower()
 
     if m == "addone":
-      model = AddOneNGram(n, sents)
+        model = AddOneNGram(n, sents)
     elif m == "interpolated":
         if n == 1:
-          model = InterpolatedNGram(n, sents)
+            model = InterpolatedNGram(n, sents)
         else:
-          model = InterpolatedNGram(n, sents, addone = True) # qe hacer!?
+            model = InterpolatedNGram(n, sents, addone=True)  # qe hacer!?
     else:
         model = NGram(n, sents)
 

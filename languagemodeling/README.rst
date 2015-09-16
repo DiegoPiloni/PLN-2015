@@ -1,4 +1,4 @@
-Ejercicio 1
+Ejercicio 2
 ===========
 
 Para poder calcular las probabilidades condicionales en un modelo de n-gramas, agregué internamente en la representación de sentencias, n&minus;1 símbolos de inicio de sentencia, y un símbolo de fin de sentencia.
@@ -11,7 +11,7 @@ Otros detalles menores que tuve que tener en cuenta en la implementación:
 
 * Manipular el caso en que se desea calcular la log_prob de una sentencia con probabilidad 0. Para resolver esto, se devuelve usando f una representación de menos infinito.
 
-Ejercicio 2
+Ejercicio 3
 ===========
 
 Implementé la clase NGramGenerator. En ella se guardan las probabilidades condicionales de cada palabra dado un
@@ -30,3 +30,33 @@ condicional un token.
 
 * generate_sent(): Genero tokens comenzando de n&minus;1 simbolos de comienzo, hasta que se encuentre
 un token de fin de sentencia. En ese caso devuelvo la oración generada.
+
+Ejercicio 4
+===========
+
+Implementé la clase AddOneNGram. Como la interfaz es la misma a la de NGram, utilicé
+herencia. Agregué un nuevo atributo en el init, para guardar el largo del vocabulario que servirá para calcular la nueva probabilidad condicional.
+
+Modifique el método cond_prob, de manera que se aplique allí el add-one smoothing.
+
+Agregué un metodo V(), el cual retorna el tamaño del vocabulario.
+
+
+Ejercicio 5
+===========
+
+Implementé en la clase NGram dos nuevos métodos:
+
+* cross_entropy(sents): Calcula cross entropy de las oraciones apartadas como 
+conjunto de test, ingresadas en 'sents'.
+
+* perplexity(sents): Calcula la perplexity de las oraciones apartadas como 
+conjunto de test, ingresadas en 'sents'.
+
+Implementé eval que toma el último 10% del training corpus como test-data, quitandolo
+del training corpus, y calcula con ese conjunto de test su perplejidad.
+
+
+Ejercicio 6
+===========
+

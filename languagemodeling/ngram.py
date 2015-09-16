@@ -1,7 +1,6 @@
 # https://docs.python.org/3/library/collections.html
 from collections import defaultdict
 from math import log
-from itertools import product
 import random
 
 
@@ -72,31 +71,26 @@ class NGram(object):
                 break
             p += log(cond_p, 2)
         return p
-        """
-        p = self.sent_prob(sent)
-        if p == 0:
-            log_p = float('-inf')
-        else:
-            log_p = log(p, 2)
-        return log_p
-        """
-    def cross_entropy(self, sents, M):
+
+    def cross_entropy(self, sents):
         """ Cross-entropy of the model.
         sents -- the test sentences as a list of tokens.
-        M -- Total number of words in test data.
         """
+        M = 0  # num of words in test-data.
+        for sent in sents:
+            M += len(sent)
         l = 0
         for sent in sents:
             l += self.sent_log_prob(sent)
         return (-l/M)
 
-    def perplexity(self, sents, M):
+    def perplexity(self, sents):
         """ Perplexity of the model.
         sents -- the test sentences as a list of tokens
-        M -- Total number of words in test data
         """
-        c_ent = self.cross_entropy(sents, M)
+        c_ent = self.cross_entropy(sents)
         return 2 ** c_ent
+
 
 class AddOneNGram(NGram):
 
@@ -129,6 +123,7 @@ class AddOneNGram(NGram):
         """Size of the vocabulary."""
         return self.len_vocab
 
+
 class InterpolatedNGram(NGram):
 
     def __init__(self, n, sents, gamma=None, addone=True):
@@ -141,9 +136,13 @@ class InterpolatedNGram(NGram):
         """
         assert n > 0
         self.n = n
-        self.counts = counts = defaultdict(int)
+        self.counts = counts = []
         self.addone = addone
         self.len_vocab = 0
+
+        # n+1 dict of counts
+        for _ in range(n+1):
+            counts.append(defaultdict(int))
 
         if not gamma:
             held_out_sents = sents[int(90*len(sents)/100):]
@@ -153,7 +152,7 @@ class InterpolatedNGram(NGram):
 
         if addone:
             vocab = []
-            for g in self.counts.keys():
+            for g in counts[n].keys():  # counts[n] = n-grams
                 vocab += [w for w in g if w != '<s>']
             self.vocab = list(set(vocab))
             self.len_vocab = len(self.vocab)
@@ -166,31 +165,26 @@ class InterpolatedNGram(NGram):
                 num_words += len(sent)
             self.gamma = self.best_gamma(held_out_sents, num_words)
 
-
     def train_counts(self, sents, counts):
         n = self.n
         for j in range(1, n+1):
+            start = ['<s>'] * (j-1)
             for sent in sents:
-                sent = ['<s>'] * (j-1) + sent + ['</s>']
+                sent = start + sent + ['</s>']
+                if j != 1:
+                    counts[j-1][tuple(start)] += 1
                 for i in range(len(sent) - j + 1):
                     ngram = tuple(sent[i: i + j])
-                    counts[ngram] += 1
+                    counts[j][ngram] += 1
                     if j == 1:
-                        counts[ngram[:-1]] += 1
-
+                        counts[j-1][ngram[:-1]] += 1
 
     def count(self, tokens):
         """Count for an n-gram or (n-1)-gram in the training data.
         tokens -- the n-gram or (n-1)-gram tuple.
         """
-        return self.counts[tuple(tokens)]
-
-
-    """def counth(self, tokens):
-        Count for an n-gram or (n-1)-gram in the held-out data.
-        tokens -- the n-gram or (n-1)-gram tuple.
-        return self.countsh[tuple(tokens)]"""
-
+        n = len(tokens)
+        return self.counts[n][tokens]
 
     def best_gamma(self, held_out_sents, M):
         """Find best gamma as argmax of perplexity.
@@ -202,14 +196,12 @@ class InterpolatedNGram(NGram):
         best_perp = actual_perp
         self.gamma = 0
         for _ in range(20):
-            print (actual_perp)
             self.gamma += 100
             actual_perp = self.perplexity(held_out_sents, M)
             if actual_perp < best_perp:
                 best_perp = actual_perp
                 best_gamma = self.gamma
         return best_gamma
-
 
     def lambdas(self, tokens):
         """List of lambdas for n-gram interpolated model
@@ -223,31 +215,28 @@ class InterpolatedNGram(NGram):
             lambdas.append(1)
         else:
             for i in range(n-1):
-                c = self.counts[tokens[i:]]
+                c = self.count(tokens[i:])
                 l_i = (1 - sum(lambdas)) * (c / (c + gamma))
                 lambdas.append(l_i)
             lambdas.append(1-sum(lambdas))
         return lambdas
-
 
     def cond_prob_ML(self, token, prev_tokens=None):
         """Maximum Likelihood conditional probability of a token.
         token -- the token.
         prev_tokens -- the previous n-1 tokens (optional only if n = 1).
         """
-        n = self.n
         addone = self.addone
         if not prev_tokens:
             prev_tokens = []
         tokens = prev_tokens + [token]
-        count_ngram = float(self.counts[tuple(tokens)])
-        count_n_1gram = self.counts[tuple(prev_tokens)]
+        count_ngram = float(self.count(tuple(tokens)))
+        count_n_1gram = self.count(tuple(prev_tokens))
         if addone:
             c_p = (count_ngram + 1) / (count_n_1gram + self.V())
         else:
             c_p = count_ngram / count_n_1gram
         return c_p
-
 
     def cond_prob(self, token, prev_tokens=None):
         """Linear interpolated conditional probability of a token.
@@ -255,7 +244,6 @@ class InterpolatedNGram(NGram):
         prev_tokens -- the previous n-1 tokens (optional only if n = 1).
         """
         n = self.n
-        gamma = self.gamma
         if not prev_tokens:
             prev_tokens = []
         assert len(prev_tokens) == n-1
@@ -266,7 +254,6 @@ class InterpolatedNGram(NGram):
             if lambd_i != 0:
                 cp_LI += self.cond_prob_ML(token, prev_tokens[i:]) * lambd_i
         return cp_LI
-
 
     def V(self):
         """Size of the vocabulary."""
