@@ -41,6 +41,16 @@ Modifique el método cond_prob, de manera que se aplique allí el add-one smooth
 
 Agregué un metodo V(), el cual retorna el tamaño del vocabulario.
 
+Resultados Perplexity:
+
+== ===========
+n  perplexity
+== ===========
+1  570
+2  1007
+3  4590
+4  6975
+== ===========
 
 Ejercicio 5
 ===========
