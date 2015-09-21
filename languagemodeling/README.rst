@@ -1,9 +1,9 @@
 Ejercicio 2
 ===========
 
-Para poder calcular las probabilidades condicionales en un modelo de n-gramas, agregué internamente en la representación de sentencias, n&minus;1 símbolos de inicio de sentencia, y un símbolo de fin de sentencia.
-Esta representación es usada en el método init de la clase NGram, para poder guardar así los counts de los n-gramas y n&minus;1 gramas de cada sentencia.
-Luego para calcular la probabilidad de una sentencia, se utiliza nuevamente esta representación, para poder calcular la probabilidad condicional de un token dados n&minus;1 tokens previos.
+Para poder calcular las probabilidades condicionales en un modelo de n-gramas, agregué internamente en la representación de sentencias, n-1 símbolos de inicio de sentencia, y un símbolo de fin de sentencia.
+Esta representación es usada en el método init de la clase NGram, para poder guardar así los counts de los n-gramas y n-1 gramas de cada sentencia.
+Luego para calcular la probabilidad de una sentencia, se utiliza nuevamente esta representación, para poder calcular la probabilidad condicional de un token dados n-1 tokens previos.
 
 Otros detalles menores que tuve que tener en cuenta en la implementación:
 
@@ -15,8 +15,8 @@ Ejercicio 3
 ===========
 
 Implementé la clase NGramGenerator. En ella se guardan las probabilidades condicionales de cada palabra dado un
-n&minus;1 grama fijo. Además se cuentan con estas probabilidades ordenadas de manera descendiente lo cual
-hará más eficiente poder generar de manera aleatoria una palabra dado un n&minus;1 grama fijo.
+n-1 grama fijo. Además se cuentan con estas probabilidades ordenadas de manera descendiente lo cual
+hará más eficiente poder generar de manera aleatoria una palabra dado un n-1 grama fijo.
 
 Metodos implementados:
 ----------------------
@@ -28,7 +28,7 @@ el método de transformada inversa, generando un número aleatorio, se escoge de
 condicional un token.
 
 
-* generate_sent(): Genero tokens comenzando de n&minus;1 simbolos de comienzo, hasta que se encuentre
+* generate_sent(): Genero tokens comenzando de n-1 simbolos de comienzo, hasta que se encuentre
 un token de fin de sentencia. En ese caso devuelvo la oración generada.
 
 Ejercicio 4
@@ -42,6 +42,7 @@ Modifique el método cond_prob, de manera que se aplique allí el add-one smooth
 Agregué un metodo V(), el cual retorna el tamaño del vocabulario.
 
 Resultados Perplexity:
+----------------------
 
 == ===========
 n  perplexity
@@ -70,3 +71,50 @@ del training corpus, y calcula con ese conjunto de test su perplejidad.
 Ejercicio 6
 ===========
 
+Implementé la clase InterpolatedNGram.
+
+Algunos métodos destacados:
+
+* best_gamma(): Se encarga de hacer un barrido para encontrar el gamma que de mejor perplexity
+a los datos held_out.
+
+* lambdas(tokens): Dado un n-1 grama devuelva una lista de los n lambdas correspondientes al
+método de interpolación utilizando el parametro gamma.
+
+* cond_prob_ML(token, prev_tokens): Devuelve maximum-likelihood estimation.
+
+* cond_prob(token, prev_tokens): La probabilidad_condicional definida por el método de interpolación.
+
+
+Resultados Perplexity:
+----------------------
+
+== ===========
+n  perplexity
+== ===========
+1  575
+2  199
+3  190
+4  190
+== ===========
+
+Ejercicio 7
+===========
+
+Implemeté la clase BackOffNGram.
+
+Como datos importantes guardo al hacer init de la instancia, los conjuntos A,
+los alpha, y denom, para luego mejorar la eficiencia del cálculo recursivo de 
+cond_prob.
+
+Resultados Perplexity:
+----------------------
+
+== ===========
+n  perplexity
+== ===========
+1  575
+2  166
+3  149
+4  163
+== ===========

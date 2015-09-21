@@ -27,7 +27,8 @@ if __name__ == '__main__':
     # load the data
     # test_data = PlaintextCorpusReader('../corpus/', ['test.txt'])
     # sents = test_data.sents()
-    sents = gutenberg.sents('austen-emma.txt')
+    #sents = gutenberg.sents('austen-persuasion.txt')
+    sents = gutenberg.sents("austen-emma.txt")
     sents = sents[int(90*len(sents)/100):]
 
     perplexity = model.perplexity(sents)

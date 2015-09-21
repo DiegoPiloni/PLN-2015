@@ -2,7 +2,7 @@
 from collections import defaultdict
 from math import log
 import random
-
+import sys
 
 class NGram(object):
 
@@ -80,7 +80,12 @@ class NGram(object):
         for sent in sents:
             M += len(sent)
         l = 0
+        i = 0 # numero de sent
+        l_s = len(sents) # numero total de sents
         for sent in sents:
+            i += 1
+            sys.stdout.write(str(i) + " | " + str(l_s) + "\r")
+            sys.stdout.flush()
             l += self.sent_log_prob(sent)
         return (-l/M)
 
@@ -290,14 +295,47 @@ class BackOffNGram(NGram):
             self.vocab = list(set(vocab))
             self.len_vocab = len(self.vocab)
 
+        self.Asets = defaultdict(set)
+        self.train_Asets()
+
+        self.alphas = dict()
+        self.denoms = dict()
+
         if beta is None:
             self.beta = self.best_beta(held_out_sents)
         else:
             self.beta = beta
+            self.train_alphas()
+            self.train_denoms()
 
-    """
-       Todos los métodos de NGram.
-    """
+    def train_Asets(self):
+        n = self.n
+        for i in range(1, n+1):
+            for tokens in self.counts[i].keys():
+                self.Asets[tokens[:-1]].add(tokens[-1])
+                if "<s>" in self.Asets[tokens[:-1]]:
+                    self.Asets[tokens[:-1]].remove("<s>")
+
+    def train_alphas(self):
+        self.alphas = dict()
+        s = 0
+        for g in self.Asets.keys():
+            s = 0
+            c_g = self.count(g)
+            for w in self.Asets[g]:
+                s += self.star_count(g + (w,)) / c_g
+            self.alphas[g] = 1 - s
+
+    def train_denoms(self):
+        self.denoms = dict()
+        n = self.n
+        s = 0
+        for i in range(1, n):
+            for tokens in self.counts[i].keys():
+                s = 0
+                for x in self.Asets[tokens]:
+                    s += self.cond_prob(x, list(tokens[1:]))
+                self.denoms[tokens] = 1 - s
 
     def train_counts(self, sents, counts):
         n = self.n
@@ -318,7 +356,10 @@ class BackOffNGram(NGram):
         tokens -- the k-gram tuple.
         """
         n = len(tokens)
-        return self.counts[n][tokens]
+        c = 0
+        if tokens in self.counts[n]:
+            c = self.counts[n][tokens]
+        return c
 
     def star_count(self, tokens):
         """ Count* for Back-off model """
@@ -329,14 +370,16 @@ class BackOffNGram(NGram):
         """
         self.beta = 0.1
         best_beta = self.beta
-        actual_perp = self.perplexity(held_out_sents)
-        best_perp = actual_perp
-        for _ in range(8):
-            self.beta += 0.1
+        best_perp = float('inf')
+        actual_perp = best_perp
+        for _ in range(9):
+            self.train_alphas()
+            self.train_denoms()
             actual_perp = self.perplexity(held_out_sents)
             if actual_perp < best_perp:
                 best_perp = actual_perp
                 best_beta = self.beta
+            self.beta += 0.1
         return best_beta
 
     def cond_prob_ML(self, token, prev_tokens=None):
@@ -367,16 +410,18 @@ class BackOffNGram(NGram):
         """
         if not prev_tokens:
             prev_tokens = []
-        A = self.A(tuple(prev_tokens))
+        tup_prev = tuple(prev_tokens)
+        tokens = tup_prev + (token,)
+        A = self.A(tup_prev)
         if token in A:
             cond_p = self.cond_prob_ML(token, prev_tokens)
         else:
-            if len(prev_tokens) == 0:
+            if len(prev_tokens) == 0:  # unigrams
                 cond_p = self.cond_prob_ML(token, prev_tokens)
             else:
-                alpha = self.alpha(tuple(prev_tokens))
-                denom = self.denom(tuple(prev_tokens))
                 c_p = self.cond_prob(token, prev_tokens[1:])
+                alpha = self.alpha(tup_prev)
+                denom = self.denom(tup_prev)
                 cond_p = alpha * c_p / denom
         return cond_p
 
@@ -384,33 +429,28 @@ class BackOffNGram(NGram):
         """Set of words with counts > 0 for a k-gram with 0 < k < n.
         tokens -- the k-gram tuple.
         """
-        k = len(tokens)
-        print(tokens)
-        a = []
-        for g, c in self.counts[k+1].items():  # counts[n] = n-grams
-            if g[:-1] == tokens and c > 0:
-                a += [w for w in g[k:] if w != '<s>']
-        a = set(a)
+        a = set()
+        if tokens in self.Asets:
+            a = self.Asets[tokens]
         return a
 
     def alpha(self, tokens):
         """Missing probability mass for a k-gram with 0 < k < n.
         tokens -- the k-gram tuple.
         """
-        A = self.A(tokens)
-        beta = self.beta
-        c = self.count(tokens)
-        return beta * len(A) / c
+        a = 1
+        if tokens in self.alphas:
+            a =  self.alphas[tokens]
+        return a
 
     def denom(self, tokens):
         """Normalization factor for a k-gram with 0 < k < n.
         tokens -- the k-gram tuple.
         """
-        s = 0
-        A = self.A(tokens)
-        for w in A:
-            s += self.cond_prob(w, tokens[1:])
-        return 1 - s
+        d = 1
+        if tokens in self.denoms:
+            d = self.denoms[tokens]
+        return d
 
     def V(self):
         """Size of the vocabulary."""
