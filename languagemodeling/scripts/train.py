@@ -26,9 +26,9 @@ if __name__ == '__main__':
     opts = docopt(__doc__)
 
     # load the data
-    # sents = gutenberg.sents(gutenberg.fileids().remove("austen-persuasion.txt"))
-    sents = gutenberg.sents("austen-emma.txt")
-    sents = sents[:int(90*len(sents)/100)]
+    sents = gutenberg.sents(gutenberg.fileids().remove("austen-persuasion.txt"))
+    #sents = gutenberg.sents("austen-emma.txt")
+    #sents = sents[:int(90*len(sents)/100)]
 
     # train the model
     n = int(opts['-n'])

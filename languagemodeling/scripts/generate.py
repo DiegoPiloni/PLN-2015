@@ -1,9 +1,7 @@
 """Generate sentences from an n-gram model.
-
 Usage:
   generate.py -s <n> -i <file>
   generate.py -h | --help
-
 Options:
   -s <n>        Amount of sentences.
   -i <file>     Input generator trained file.

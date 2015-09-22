@@ -1,47 +1,30 @@
 # https://docs.python.org/3/library/collections.html
 from collections import defaultdict
+from abc import ABCMeta, abstractmethod
 from math import log
 import random
 import sys
 
-class NGram(object):
+
+class LanguageModel(metaclass=ABCMeta):
 
     def __init__(self, n, sents):
-        """
+        """ Language Model Abstract Base Class.
+        IMPORTANT: Not utseful by itself. Must be completed by derived class
         n -- order of the model.
-        sents -- list of sentences, each one being a list of tokens.
         """
         assert n > 0
         self.n = n
-        self.counts = counts = defaultdict(int)
 
-        for sent in sents:
-            sent = ['<s>']*(n-1) + sent + ['</s>']
-            for i in range(len(sent) - n + 1):
-                ngram = tuple(sent[i: i + n])
-                counts[ngram] += 1
-                counts[ngram[:-1]] += 1
-
+    @abstractmethod
     def count(self, tokens):
-        """Count for an n-gram or (n-1)-gram.
-        tokens -- the n-gram or (n-1)-gram tuple.
-        """
-        n = self.n
-        l_t = len(tokens)
-        assert l_t == n or l_t == (n-1)
-        return self.counts[tuple(tokens)]
+        """IMPORTANT: Must be implemented by derived class"""
+        pass
 
+    @abstractmethod
     def cond_prob(self, token, prev_tokens=None):
-        """Conditional probability of a token.
-        token -- the token.
-        prev_tokens -- the previous n-1 tokens (optional only if n = 1).
-        """
-        n = self.n
-        if not prev_tokens:
-            prev_tokens = []
-        assert len(prev_tokens) == n - 1
-        tokens = prev_tokens + [token]
-        return self.counts[tuple(tokens)] / self.counts[tuple(prev_tokens)]
+        """IMPORTANT: Must be implemented by derived class"""
+        pass
 
     def sent_prob(self, sent):
         """Probability of a sentence. Warning: subject to underflow problems.
@@ -72,6 +55,19 @@ class NGram(object):
             p += log(cond_p, 2)
         return p
 
+    def log_probability(self, sents):
+        """ Log-probabilty of sents in test data. """
+        log_prob = 0
+        i = 0  # for printing
+        l_s = len(sents)  # for printing
+        for sent in sents:
+            log_prob += self.sent_log_prob(sent)
+            # Progress in sents
+            i += 1
+            sys.stdout.write(str(i) + " | " + str(l_s) + "\r")
+            sys.stdout.flush()
+        return log_prob
+
     def cross_entropy(self, sents):
         """ Cross-entropy of the model.
         sents -- the test sentences as a list of tokens.
@@ -79,22 +75,56 @@ class NGram(object):
         M = 0  # num of words in test-data.
         for sent in sents:
             M += len(sent)
-        l = 0
-        i = 0 # numero de sent
-        l_s = len(sents) # numero total de sents
-        for sent in sents:
-            i += 1
-            sys.stdout.write(str(i) + " | " + str(l_s) + "\r")
-            sys.stdout.flush()
-            l += self.sent_log_prob(sent)
-        return (-l/M)
+        l = self.log_probability(sents)
+        c_e = -l / M  # Cross entropy
+        return c_e
 
     def perplexity(self, sents):
         """ Perplexity of the model.
         sents -- the test sentences as a list of tokens
         """
         c_ent = self.cross_entropy(sents)
-        return 2 ** c_ent
+        perp = 2 ** c_ent  # perplexity
+        return perp
+
+
+class NGram(LanguageModel):
+
+    def __init__(self, n, sents):
+        """
+        n -- order of the model.
+        sents -- list of sentences, each one being a list of tokens.
+        """
+        super(NGram, self).__init__(n, sents)
+        self.counts = counts = defaultdict(int)
+
+        for sent in sents:
+            sent = ['<s>']*(n-1) + sent + ['</s>']
+            for i in range(len(sent) - n + 1):
+                ngram = tuple(sent[i: i + n])
+                counts[ngram] += 1  # n_grams
+                counts[ngram[:-1]] += 1  # n-1_grams
+
+    def count(self, tokens):
+        """Count for an n-gram or (n-1)-gram.
+        tokens -- the n-gram or (n-1)-gram tuple.
+        """
+        n = self.n
+        lt = len(tokens)
+        assert lt == n or lt == (n-1)
+        return self.counts[tokens]
+
+    def cond_prob(self, token, prev_tokens=None):
+        """Conditional probability of a token.
+        token -- the token.
+        prev_tokens -- the previous n-1 tokens (optional only if n = 1).
+        """
+        n = self.n
+        if not prev_tokens:
+            prev_tokens = []
+        assert len(prev_tokens) == n - 1
+        tokens = prev_tokens + [token]
+        return self.count(tuple(tokens)) / self.count(tuple(prev_tokens))
 
 
 class AddOneNGram(NGram):
@@ -129,7 +159,7 @@ class AddOneNGram(NGram):
         return self.len_vocab
 
 
-class InterpolatedNGram(NGram):
+class InterpolatedNGram(LanguageModel):
 
     def __init__(self, n, sents, gamma=None, addone=True):
         """
@@ -139,13 +169,11 @@ class InterpolatedNGram(NGram):
             held-out data).
         addone -- whether to use addone smoothing (default: True).
         """
-        assert n > 0
-        self.n = n
-        self.counts = counts = []
+        super(InterpolatedNGram, self).__init__(n, sents)
+        self.counts = counts = []  # List of n+1 dicts.
         self.addone = addone
         self.len_vocab = 0
 
-        # n+1 dict of counts
         for _ in range(n+1):
             counts.append(defaultdict(int))
 
@@ -261,7 +289,7 @@ class InterpolatedNGram(NGram):
         return self.len_vocab
 
 
-class BackOffNGram(NGram):
+class BackOffNGram(LanguageModel):
 
     def __init__(self, n, sents, beta=None, addone=True):
         """
@@ -272,13 +300,11 @@ class BackOffNGram(NGram):
             held-out data).
         addone -- whether to use addone smoothing (default: True).
         """
-        assert n > 0
-        self.n = n
-        self.counts = counts = []
+        super(BackOffNGram, self).__init__(n, sents)
+        self.counts = counts = []  # List of n+1 dicts
         self.addone = addone
         self.len_vocab = 0
 
-        # n+1 dict of counts
         for _ in range(n+1):
             counts.append(defaultdict(int))
 
@@ -380,6 +406,7 @@ class BackOffNGram(NGram):
                 best_perp = actual_perp
                 best_beta = self.beta
             self.beta += 0.1
+        print("Beta: %.2f" % best_beta)
         return best_beta
 
     def cond_prob_ML(self, token, prev_tokens=None):
@@ -465,7 +492,7 @@ class NGramGenerator(object):
         """
         self.n = model.n
         self.probs = defaultdict(dict)
-        self.sorted_probs = {}
+        self.sorted_probs = defaultdict(list)
 
         n = model.n
         d = model.counts
@@ -477,8 +504,7 @@ class NGramGenerator(object):
                 self.probs[g[:-1]][g[-1]] = model.cond_prob(g[-1], prev)
 
         # self.sorted_probs
-        self.sorted_probs = self.probs.copy()
-        for (x, y) in self.sorted_probs.items():
+        for (x, y) in self.probs.items():
             l = list(y.items())
             l.sort(key=lambda x: ((-1) * x[1], x[0]))
             self.sorted_probs[x] = l
@@ -487,14 +513,12 @@ class NGramGenerator(object):
         """Randomly generate a sentence."""
         n = self.n
         sentence = []
-        token = ""
         prev_tokens = ('<s>',) * (n-1)
-        while 1:
-            token = self.generate_token(prev_tokens)
-            if token == '</s>':
-                break
+        token = self.generate_token(prev_tokens)
+        while token != '</s>':
             sentence.append(token)
             prev_tokens = (prev_tokens + (token,))[1:]
+            token = self.generate_token(prev_tokens)
         return sentence
 
     def generate_token(self, prev_tokens=None):
@@ -507,6 +531,7 @@ class NGramGenerator(object):
         assert len(prev_tokens) == n-1
 
         sorted_probs = self.sorted_probs[tuple(prev_tokens)]
+        # inverse transform sampling method
         x = 0
         u = random.random()
         F = sorted_probs[x][1]
