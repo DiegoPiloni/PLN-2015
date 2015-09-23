@@ -3,7 +3,6 @@ from collections import defaultdict
 from abc import ABCMeta, abstractmethod
 from math import log
 import random
-import sys
 
 
 class LanguageModel(metaclass=ABCMeta):
@@ -58,14 +57,8 @@ class LanguageModel(metaclass=ABCMeta):
     def log_probability(self, sents):
         """ Log-probabilty of sents in test data. """
         log_prob = 0
-        # i = 0  # for printing
-        # l_s = len(sents)  # for printing
         for sent in sents:
             log_prob += self.sent_log_prob(sent)
-            # Progress in sents
-            # i += 1
-            # sys.stdout.write(str(i) + " | " + str(l_s) + "\r")
-            # sys.stdout.flush()
         return log_prob
 
     def cross_entropy(self, sents):

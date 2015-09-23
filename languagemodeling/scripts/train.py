@@ -18,7 +18,7 @@ Options:
 """
 from docopt import docopt
 import pickle
-from nltk.corpus import gutenberg, PlaintextCorpusReader
+from nltk.corpus import gutenberg
 from languagemodeling.ngram import NGram, AddOneNGram, InterpolatedNGram, BackOffNGram, NGramGenerator
 
 
@@ -27,8 +27,6 @@ if __name__ == '__main__':
 
     # load the data
     sents = gutenberg.sents(gutenberg.fileids().remove("austen-persuasion.txt"))
-    # sents = gutenberg.sents("austen-emma.txt")
-    # sents = sents[:int(90*len(sents)/100)]
 
     # train the model
     n = int(opts['-n'])
