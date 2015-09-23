@@ -178,7 +178,7 @@ class InterpolatedNGram(LanguageModel):
 
         if addone:
             vocab = []
-            for g in counts[n].keys():  # counts[n] = n-grams
+            for g in counts[n].keys():  # counts[n] = counts of n-grams
                 vocab += [w for w in g if w != '<s>']
             self.vocab = list(set(vocab))
             self.len_vocab = len(self.vocab)
@@ -315,7 +315,7 @@ class BackOffNGram(LanguageModel):
 
         if addone:
             vocab = []
-            for g in counts[n].keys():  # counts[n] = n-grams
+            for g in counts[n].keys():  # counts[n] = counts of n-grams
                 vocab += [w for w in g if w != '<s>']
             self.vocab = list(set(vocab))
             self.len_vocab = len(self.vocab)
