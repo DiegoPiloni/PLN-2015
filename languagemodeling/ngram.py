@@ -438,7 +438,6 @@ class BackOffNGram(LanguageModel):
         if not prev_tokens:
             prev_tokens = []
         tup_prev = tuple(prev_tokens)
-        tokens = tup_prev + (token,)
         A = self.A(tup_prev)
         if token in A:
             cond_p = self.cond_prob_ML(token, prev_tokens)
@@ -467,7 +466,7 @@ class BackOffNGram(LanguageModel):
         """
         a = 1
         if tokens in self.alphas:
-            a =  self.alphas[tokens]
+            a = self.alphas[tokens]
         return a
 
     def denom(self, tokens):

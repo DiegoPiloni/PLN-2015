@@ -8,7 +8,6 @@ Options:
   -h --help     Show this screen.
 """
 from docopt import docopt
-from languagemodeling.ngram import NGramGenerator
 import pickle
 
 
