@@ -1,5 +1,8 @@
+Práctico 1 - PLN 2015
+=====================
+
 Ejercicio 2
-===========
+-----------
 
 Para poder calcular las probabilidades condicionales en un modelo de n-gramas, agregué internamente en la representación de sentencias, n-1 símbolos de inicio de sentencia, y un símbolo de fin de sentencia.
 Esta representación es usada en el método init de la clase NGram, para poder guardar así los counts de los n-gramas y n-1 gramas de cada sentencia.
@@ -12,8 +15,8 @@ Otros detalles menores que tuve que tener en cuenta en la implementación:
 * Manipular el caso en que se desea calcular la log_prob de una sentencia con probabilidad 0. Para resolver esto, se devuelve usando f una representación de menos infinito.
 
 
-Para entrenar:
---------------
+### Para entrenar:
+
 ```
 train.py -n <n> [-m ngram] -o <file> [-g <file>]
 ```
@@ -25,8 +28,7 @@ train.py -n <n> [-m ngram] -o <file> [-g <file>]
 * -g: Archivo de salida con Generador.
 
 
-Para evaluar:
--------------
+### Para evaluar:
 
 ```
 eval.py -i <file>
@@ -36,15 +38,13 @@ eval.py -i <file>
 
 
 Ejercicio 3
-===========
+-----------
 
 Implementé la clase NGramGenerator. En ella se guardan las probabilidades condicionales de cada palabra dado un
 n-1 grama fijo. Además se cuentan con estas probabilidades ordenadas de manera descendiente lo cual
 hará más eficiente poder generar de manera aleatoria una palabra dado un n-1 grama fijo.
 
-Metodos implementados:
-----------------------
-
+### Metodos implementados:
 
 * generate_token(previus_tokens): Dado un n-1 grama (previus_tokens), se genera de manera aleatoria un
 token. Para ello utilicé las probabilidades condicionales ordenadas decrecientemente y luego usando
@@ -55,8 +55,8 @@ condicional un token.
 * generate_sent(): Genero tokens comenzando de n-1 simbolos de comienzo, hasta que se encuentre
 un token de fin de sentencia. En ese caso devuelvo la oración generada.
 
-Para generar:
--------------
+### Para generar:
+
 
 ```
 generate.py -s <n> -i <file>
@@ -67,8 +67,7 @@ generate.py -s <n> -i <file>
 * -i Archivo con el generador (Archivo creado con train.py)
 
 
-Sentencias generadadas (Austen-Emma)
-------------------------------------
+### Sentencias generadadas (Austen-Emma)
 
 | ngram | sents                                                                                                                                                                                                                                                                                                                                                                                            |
 |-------|--------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
@@ -90,7 +89,7 @@ Sentencias generadadas (Austen-Emma)
 |       |                                                                                                                                                                                                                                                                                                                                                                                                  |
 
 Ejercicio 4
-===========
+-----------
 
 Complementando la clase NGram, agregué un nuevo atributo en el init, para guardar el largo del vocabulario que servirá para calcular la nueva probabilidad condicional.
 
@@ -98,8 +97,7 @@ Modifique el método cond_prob, de manera que se aplique allí el add-one smooth
 
 Agregué un metodo V(), el cual retorna el tamaño del vocabulario.
 
-Resultados Perplexity:
-----------------------
+### Resultados Perplexity:
 
 | n | Perplexity |
 |---|------------|
@@ -109,8 +107,8 @@ Resultados Perplexity:
 | 4 | 6975       |
 
 
-Para entrenar:
---------------
+### Para entrenar:
+
 ```
 train.py -n <n> -m addone -o <file>
 ```
@@ -120,8 +118,7 @@ train.py -n <n> -m addone -o <file>
 * -o: Archivo de salida con el Modelo.
 
 
-Para evaluar:
--------------
+### Para evaluar:
 
 ```
 eval.py -i <file>
@@ -131,7 +128,7 @@ eval.py -i <file>
 
 
 Ejercicio 5
-===========
+-----------
 
 Implementé en la super clase LanguageModel tres nuevos métodos:
 
@@ -145,7 +142,7 @@ Implementé el script eval que permite tomar el último 10% del training corpus 
 
 
 Ejercicio 6
-===========
+-----------
 
 Implementé la clase InterpolatedNGram.
 
@@ -161,8 +158,7 @@ método de interpolación utilizando el parametro gamma.
 
 * cond_prob(token, prev_tokens): La probabilidad_condicional definida por el método de interpolación.
 
-Resultados Perplexity:
-----------------------
+### Resultados Perplexity:
 
 | n | Perplexity |
 |---|------------|
@@ -172,8 +168,8 @@ Resultados Perplexity:
 | 4 | 190        |
 
 
-Para entrenar:
---------------
+### Para entrenar:
+
 ```
 train.py -n <n> -m interpolated -o <file>
 ```
@@ -183,8 +179,7 @@ train.py -n <n> -m interpolated -o <file>
 * -o: Archivo de salida con el Modelo.
 
 
-Para evaluar:
--------------
+### Para evaluar:
 
 ```
 eval.py -i <file>
@@ -194,7 +189,7 @@ eval.py -i <file>
 
 
 Ejercicio 7
-===========
+-----------
 
 Implemeté la clase BackOffNGram.
 
@@ -202,8 +197,7 @@ Como datos importantes se guardo al hacer init de la instancia, los conjuntos A,
 los alpha, y denom, para luego mejorar la eficiencia del cálculo recursivo de 
 cond_prob.
 
-Resultados Perplexity:
-----------------------
+### Resultados Perplexity:
 
 | n | Perplexity |
 |---|------------|
@@ -213,8 +207,8 @@ Resultados Perplexity:
 | 4 | 163        |
 
 
-Para entrenar:
---------------
+### Para entrenar:
+
 ```
 train.py -n <n> -m backoff -o <file>
 ```
@@ -224,11 +218,10 @@ train.py -n <n> -m backoff -o <file>
 * -o: Archivo de salida con el Modelo.
 
 
-Para evaluar:
--------------
+### Para evaluar:
+
 
 ```
 eval.py -i <file>
 ```
-
 * -i: Archivo con el Modelo
