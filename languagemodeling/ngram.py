@@ -58,14 +58,14 @@ class LanguageModel(metaclass=ABCMeta):
     def log_probability(self, sents):
         """ Log-probabilty of sents in test data. """
         log_prob = 0
-        i = 0  # for printing
-        l_s = len(sents)  # for printing
+        # i = 0  # for printing
+        # l_s = len(sents)  # for printing
         for sent in sents:
             log_prob += self.sent_log_prob(sent)
             # Progress in sents
-            i += 1
-            sys.stdout.write(str(i) + " | " + str(l_s) + "\r")
-            sys.stdout.flush()
+            # i += 1
+            # sys.stdout.write(str(i) + " | " + str(l_s) + "\r")
+            # sys.stdout.flush()
         return log_prob
 
     def cross_entropy(self, sents):
@@ -201,12 +201,12 @@ class InterpolatedNGram(LanguageModel):
             start = ['<s>'] * (j-1)
             for sent in sents:
                 sent = start + sent + ['</s>']
-                if j != 1:
+                if j != 1:  # start of sent
                     counts[j-1][tuple(start)] += 1
                 for i in range(len(sent) - j + 1):
                     ngram = tuple(sent[i: i + j])
                     counts[j][ngram] += 1
-                    if j == 1:
+                    if j == 1:  # ()
                         counts[j-1][ngram[:-1]] += 1
 
     def count(self, tokens):
@@ -251,7 +251,8 @@ class InterpolatedNGram(LanguageModel):
         return lambdas
 
     def cond_prob_ML(self, token, prev_tokens=None):
-        """Maximum Likelihood conditional probability of a token.
+        """Maximum Likelihood conditional probability of a token or Add-one
+        conditional probability.
         token -- the token.
         prev_tokens -- the previous n-1 tokens (optional only if n = 1).
         """
@@ -334,35 +335,6 @@ class BackOffNGram(LanguageModel):
             self.train_alphas()
             self.train_denoms()
 
-    def train_Asets(self):
-        n = self.n
-        for i in range(1, n+1):
-            for tokens in self.counts[i].keys():
-                self.Asets[tokens[:-1]].add(tokens[-1])
-                if "<s>" in self.Asets[tokens[:-1]]:
-                    self.Asets[tokens[:-1]].remove("<s>")
-
-    def train_alphas(self):
-        self.alphas = dict()
-        s = 0
-        for g in self.Asets.keys():
-            s = 0
-            c_g = self.count(g)
-            for w in self.Asets[g]:
-                s += self.star_count(g + (w,)) / c_g
-            self.alphas[g] = 1 - s
-
-    def train_denoms(self):
-        self.denoms = dict()
-        n = self.n
-        s = 0
-        for i in range(1, n):
-            for tokens in self.counts[i].keys():
-                s = 0
-                for x in self.Asets[tokens]:
-                    s += self.cond_prob(x, list(tokens[1:]))
-                self.denoms[tokens] = 1 - s
-
     def train_counts(self, sents, counts):
         n = self.n
         for j in range(1, n+1):
@@ -376,6 +348,32 @@ class BackOffNGram(LanguageModel):
                     counts[j][ngram] += 1
                     if j == 1:
                         counts[j-1][ngram[:-1]] += 1
+
+    def train_Asets(self):
+        n = self.n
+        for i in range(1, n+1):
+            for tokens in self.counts[i].keys():
+                self.Asets[tokens[:-1]].add(tokens[-1])
+                if "<s>" in self.Asets[tokens[:-1]]:
+                    self.Asets[tokens[:-1]].remove("<s>")
+
+    def train_alphas(self):
+        self.alphas = dict()
+        beta = self.beta
+        for g in self.Asets.keys():
+            c_g = self.count(g)
+            len_A = len(self.Asets[g])
+            self.alphas[g] = beta * len_A / c_g
+
+    def train_denoms(self):
+        self.denoms = dict()
+        n = self.n
+        for i in range(1, n):
+            for tokens in self.counts[i].keys():
+                s = 0
+                for x in self.Asets[tokens]:
+                    s += self.cond_prob(x, list(tokens[1:]))
+                self.denoms[tokens] = 1 - s
 
     def count(self, tokens):
         """Count for a k-gram in the training data.
@@ -410,25 +408,31 @@ class BackOffNGram(LanguageModel):
         return best_beta
 
     def cond_prob_ML(self, token, prev_tokens=None):
-        """Maximum Likelihood conditional probability of a token.
+        """Maximum Likelihood conditional probability or Add-one conditional
+        probability.
         token -- the token.
-        prev_tokens -- the previous n-1 tokens (optional only if n = 1).
+        prev_tokens -- the previous k-1 tokens.
         """
         addone = self.addone
         if not prev_tokens:
             prev_tokens = []
         tokens = prev_tokens + [token]
-        star_count_ngram = float(self.star_count(tuple(tokens)))
-        count_ngram = float(self.count(tuple(tokens)))
-        count_n_1gram = self.count(tuple(prev_tokens))
-        if len(tokens) == 1:
-            if addone:
-                c_p = (count_ngram + 1) / (count_n_1gram + self.V())
-            else:
-                c_p = count_ngram / count_n_1gram
+        count_kgram = float(self.count(tuple(tokens)))
+        count_k_1gram = self.count(tuple(prev_tokens))
+        if addone:
+            c_p = (count_kgram + 1) / (count_k_1gram + self.V())
         else:
-            c_p = star_count_ngram / count_n_1gram
+            c_p = count_kgram / count_k_1gram
         return c_p
+
+    def cond_prob_star(self, token, prev_tokens=None):
+        """Used when token in A(prev_tokens)"""
+        if not prev_tokens:
+            prev_tokens = []
+        tokens = prev_tokens + [token]
+        star_count_kgram = float(self.star_count(tuple(tokens)))
+        count_k_1gram = self.count(tuple(prev_tokens))
+        return star_count_kgram / count_k_1gram
 
     def cond_prob(self, token, prev_tokens=None):
         """Linear interpolated conditional probability of a token.
@@ -439,16 +443,19 @@ class BackOffNGram(LanguageModel):
             prev_tokens = []
         tup_prev = tuple(prev_tokens)
         A = self.A(tup_prev)
-        if token in A:
+        if len(prev_tokens) == 0:  # unigram
             cond_p = self.cond_prob_ML(token, prev_tokens)
         else:
-            if len(prev_tokens) == 0:  # unigrams
-                cond_p = self.cond_prob_ML(token, prev_tokens)
+            if token in A:
+                cond_p = self.cond_prob_star(token, prev_tokens)
             else:
                 c_p = self.cond_prob(token, prev_tokens[1:])
-                alpha = self.alpha(tup_prev)
-                denom = self.denom(tup_prev)
-                cond_p = alpha * c_p / denom
+                if c_p != 0:
+                    alpha = self.alpha(tup_prev)
+                    denom = self.denom(tup_prev)
+                    cond_p = alpha * c_p / denom
+                else:
+                    cond_p = 0
         return cond_p
 
     def A(self, tokens):
