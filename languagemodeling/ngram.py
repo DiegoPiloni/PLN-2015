@@ -189,6 +189,10 @@ class InterpolatedNGram(LanguageModel):
             self.gamma = gamma
 
     def train_counts(self, sents, counts):
+        """Train n+1 dicts with counts for 1-grams to n-grams
+        sents -- list of sentences, each one being a list of tokens.
+        counts -- list that will contain the dicts
+        """
         n = self.n
         for j in range(1, n+1):
             start = ['<s>'] * (j-1)
@@ -330,6 +334,10 @@ class BackOffNGram(LanguageModel):
             self.train_denoms()
 
     def train_counts(self, sents, counts):
+        """Train n+1 dicts with counts for 1-grams to n-grams
+        sents -- list of sentences, each one being a list of tokens.
+        counts -- list that will contain the dicts
+        """
         n = self.n
         for j in range(1, n+1):
             start = ['<s>'] * (j-1)
@@ -344,6 +352,7 @@ class BackOffNGram(LanguageModel):
                         counts[j-1][ngram[:-1]] += 1
 
     def train_Asets(self):
+        """A sets computed at init"""
         n = self.n
         for i in range(1, n+1):
             for tokens in self.counts[i].keys():
@@ -352,6 +361,7 @@ class BackOffNGram(LanguageModel):
                     self.Asets[tokens[:-1]].remove("<s>")
 
     def train_alphas(self):
+        """Alphas computed at init"""
         self.alphas = dict()
         beta = self.beta
         for g in self.Asets.keys():
@@ -360,6 +370,7 @@ class BackOffNGram(LanguageModel):
             self.alphas[g] = beta * len_A / c_g
 
     def train_denoms(self):
+        """Denoms computed at init"""
         self.denoms = dict()
         n = self.n
         for i in range(1, n):
