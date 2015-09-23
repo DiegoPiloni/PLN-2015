@@ -226,10 +226,7 @@ class TestBackoffNGram(TestCase):
             [['<s>', t] for t in prev_tokens] + \
             [[t1, t2] for t1 in prev_tokens for t2 in prev_tokens]
 
-        i = 0
         for model in models:
-            i+=1
-            print(i)
             for prev in prevs:
                 prob_sum = sum(model.cond_prob(token, prev) for token in tokens)
                 # prob_sum < 1.0 or almost equal to 1.0:
