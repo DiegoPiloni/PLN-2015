@@ -1,6 +1,13 @@
 Práctico 1 - PLN 2015
 =====================
 
+### Herramientas utilizadas:
+
+* Python3
+* NLTK
+* Pickle
+
+
 Ejercicio 2
 -----------
 
@@ -22,9 +29,7 @@ train.py -n <n> [-m ngram] -o <file> [-g <file>]
 ```
 
 * -n: Orden del modelo
-
 * -o: Archivo de salida con el Modelo.
-
 * -g: Archivo de salida con Generador.
 
 
@@ -99,12 +104,15 @@ Agregué un metodo V(), el cual retorna el tamaño del vocabulario.
 
 ### Resultados Perplexity:
 
+* Training Corpus: Todos los textos de nltk.corpus.gutenberg excepto 'austen-emma.txt'
+* Test data: 'austen-emma.txt'
+
 | n | Perplexity |
 |---|------------|
-| 1 | 570        |
-| 2 | 1007       |
-| 3 | 4590       |
-| 4 | 6975       |
+| 1 | 1122       |
+| 2 | 2483       |
+| 3 | 22021      |
+| 4 | 44884      |
 
 
 ### Para entrenar:
@@ -114,7 +122,6 @@ train.py -n <n> -m addone -o <file>
 ```
 
 * -n: Orden del modelo
-
 * -o: Archivo de salida con el Modelo.
 
 
@@ -160,12 +167,15 @@ método de interpolación utilizando el parametro gamma.
 
 ### Resultados Perplexity:
 
+* Training Corpus: Todos los textos de nltk.corpus.gutenberg excepto 'austen-emma.txt'
+* Test data: 'austen-emma.txt'
+
 | n | Perplexity |
 |---|------------|
-| 1 | 575        |
-| 2 | 199        |
-| 3 | 190        |
-| 4 | 190        |
+| 1 | 1108       |
+| 2 | 378        |
+| 3 | 358        |
+| 4 | 359        |
 
 
 ### Para entrenar:
@@ -175,7 +185,6 @@ train.py -n <n> -m interpolated -o <file>
 ```
 
 * -n: Orden del modelo
-
 * -o: Archivo de salida con el Modelo.
 
 
@@ -199,12 +208,17 @@ cond_prob.
 
 ### Resultados Perplexity:
 
+### Resultados Perplexity:
+
+* Training Corpus: Todos los textos de nltk.corpus.gutenberg excepto 'austen-emma.txt'
+* Test data: 'austen-emma.txt'
+
 | n | Perplexity |
 |---|------------|
-| 1 | 575        |
-| 2 | 166        |
-| 3 | 149        |
-| 4 | 163        |
+| 1 | 1108       |
+| 2 | 313        |
+| 3 | 273        |
+| 4 | 275        |
 
 
 ### Para entrenar:
@@ -214,7 +228,6 @@ train.py -n <n> -m backoff -o <file>
 ```
 
 * -n: Orden del modelo
-
 * -o: Archivo de salida con el Modelo.
 
 

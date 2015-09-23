@@ -23,7 +23,7 @@ if __name__ == '__main__':
     model = pickle.load(input_file)
     input_file.close()
     # load the data
-    sents = gutenberg.sents('austen-persuasion.txt')
+    sents = gutenberg.sents('austen-emma.txt')
 
     perplexity = model.perplexity(sents)
     print(perplexity)

@@ -217,12 +217,13 @@ class InterpolatedNGram(LanguageModel):
         actual_perp = self.perplexity(held_out_sents)
         best_perp = actual_perp
         self.gamma = 0
-        for _ in range(20):
-            self.gamma += 100
+        for _ in range(10):
+            self.gamma += 200
             actual_perp = self.perplexity(held_out_sents)
             if actual_perp < best_perp:
                 best_perp = actual_perp
                 best_gamma = self.gamma
+        print("Gamma: %.2f" % best_gamma)
         return best_gamma
 
     def lambdas(self, tokens):
