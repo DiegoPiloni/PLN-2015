@@ -1,0 +1,6 @@
+*~
+*.sublime-workspace
+*.sublime-project
+*.pyc
+__pycache__/
+ancora/
