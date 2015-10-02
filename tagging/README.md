@@ -4,8 +4,11 @@ Ejercicio 1
 ### Estadísticas:
 
 Sents: 17379
+
 Tokens: 517300
+
 Words: 46483
+
 Tags: 48
 
 #### 10 most frequent tags:
