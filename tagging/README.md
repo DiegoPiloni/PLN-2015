@@ -1,17 +1,20 @@
-Ejercicio 1
------------
+Práctico 2 - PLN 2015
+=====================
+
+Ejercicio 1)
+------------
 
 ### Estadísticas:
 
-Sents: 17379
+* Sents: 17379
 
-Tokens: 517300
+* Tokens: 517300
 
-Words: 46483
+* Words: 46483
 
-Tags: 48
+* Tags: 48
 
-#### 10 most frequent tags:
+#### 10 tags más frecuentes:
 
 |Tag | Freq  |   %   | Descripción  | 5 most frequent words                                            |
 |----|-------|-------|--------------|------------------------------------------------------------------|
@@ -25,3 +28,17 @@ np  | 29113 |  5.63 | Nombre Propio         | 'Gobierno', 'España', 'PP', 'Barc
 fp  | 21157 |  4.09 | Puntuación            | '.', '(', ')'                                          |
 rg  | 15333 |  2.96 | Adverbio General      | 'más', 'hoy', 'también', 'ayer', 'ya'                  |
 cc  | 15023 |  2.90 | Conjunción Coordinada | 'y', 'pero', 'o', 'Pero', 'e'                          |
+
+#### Niveles de Ambiguedad:
+
+Ambig. Level | Words  | Percentage | 5 Most frequent words        |
+------|--------|------------|-------------------------------------|
+1     | 44110  | 94.89      | ',', 'el', 'en', 'con', 'por'       |
+2     | 2194   | 4.72       | 'la', 'y', '"', 'los', 'del'        |
+3     | 153    | 0.33       | '.', 'a', 'un', 'no', 'es'          |
+4     | 19     | 0.04       | 'de', 'dos', 'este', 'tres', 'todo' |
+5     | 4      | 0.01       | 'que', 'mismo', 'cinco', 'medio'    |
+6     | 3      | 0.01       | 'una', 'como', 'uno'                |
+7     | 0      | 0.00       |                                     |
+8     | 0      | 0.00       |                                     |
+9     | 0      | 0.00       |                                     |
