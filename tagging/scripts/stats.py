@@ -67,8 +67,8 @@ if __name__ == '__main__':
         tag = counted_tags[i][0]
         freq = counted_tags[i][1]
         perc = freq / total_tags * 100
-        lw = list(counted_tag_words[tag].items()) # List of words with tag
-        lw.sort(key = lambda x: x[1], reverse=True)
+        lw = list(counted_tag_words[tag].items())  # List of words with tag
+        lw.sort(key=lambda x: x[1], reverse=True)
         mfw = [x[0] for x in lw[:5]]  # 5 most freq words with tag
         print(tag + "  | {0} | {1:>5.2f} | {2}".format(freq, perc, mfw))
 
@@ -84,7 +84,7 @@ if __name__ == '__main__':
         words = levels_of_ambiguety[i]
         perc = words / vocab_w * 100
         lwi = [w for w in list(word_tags.items()) if len(w[1][1]) == i+1]
-        lwi.sort(key = lambda w: w[1][0], reverse = True)
+        lwi.sort(key=lambda w: w[1][0], reverse=True)
         lwi = list(map(lambda x: x[0], lwi))
         mfwi = lwi[:5]
         print("{0:<6}| {1:<7}| {2:<11.2f}| {3}".format(i+1, words, perc, mfwi))

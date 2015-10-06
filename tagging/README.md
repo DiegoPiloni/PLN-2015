@@ -42,3 +42,12 @@ Ambig. Level | Words  | Percentage | 5 Most frequent words        |
 7     | 0      | 0.00       |                                     |
 8     | 0      | 0.00       |                                     |
 9     | 0      | 0.00       |                                     |
+
+
+Ejercicio 2)
+------------
+
+Implementación de un Baseline Tagger.
+
+Se elige para cada palabra su etiqueta más frecuente observada en entrenamiento.
+Para las palabras desconocidas, se devuelve la etiqueta más frecuente observada en entrenamiento.
