@@ -17,7 +17,7 @@ if __name__ == '__main__':
 
     # Load the data
     corpus = SimpleAncoraCorpusReader('ancora/ancora-2.0/')
-    sents = corpus.tagged_sents()
+    sents = list(corpus.tagged_sents())
 
     # Compute the statistics
 
