@@ -7,7 +7,18 @@ class BaselineTagger:
         """
         tagged_sents -- training sentences, each one being a list of pairs.
         """
-        self.tagged_sents = tagged_sents
+
+        # Tags for each word with counts
+        words_tags_counted = defaultdict(lambda: defaultdict(int))
+        for sent in tagged_sents:
+            for word, tag in sent:
+                words_tags_counted[word][tag] += 1
+
+        # Best tag for each word
+        self.words_tags = defaultdict(str)
+        for w in words_tags_counted:
+            c_tags = words_tags_counted[w]
+            self.words_tags[w] = max(c_tags.keys(), key=lambda x: c_tags[x])
 
         # Most frequent tag in tagged_sents
         tags = defaultdict(int)
@@ -32,13 +43,7 @@ class BaselineTagger:
         if unknown:
             tag = self.most_frequent_tag
         else:
-            tagged_sents = self.tagged_sents
-            w_tags = defaultdict(int)  # w tags and counts of each tag
-            for sent in tagged_sents:
-                for word, tag in sent:
-                    if word == w:
-                        w_tags[tag] += 1
-            tag = max(w_tags.keys(), key=lambda x: w_tags[x])
+            tag = self.words_tags[w]
         return tag
 
     def unknown(self, w):
@@ -46,11 +51,8 @@ class BaselineTagger:
 
         w -- the word.
         """
-        tagged_sents = self.tagged_sents
         unknown = True
-        for sent in tagged_sents:
-            for word, tag in sent:
-                if word == w:
-                    unknown = False
-                    break
+        tagged_words = self.words_tags
+        if w in tagged_words:
+            unknown = False
         return unknown
