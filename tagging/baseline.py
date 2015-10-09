@@ -21,11 +21,11 @@ class BaselineTagger:
             self.words_tags[w] = max(c_tags.keys(), key=lambda x: c_tags[x])
 
         # Most frequent tag in tagged_sents
-        tags = defaultdict(int)
+        self.c_tags = c_tags = defaultdict(int)
         for sent in tagged_sents:
             for word, tag in sent:
-                tags[tag] += 1
-        self.most_frequent_tag = max(tags.keys(), key=lambda x: tags[x])
+                c_tags[tag] += 1
+        self.most_frequent_tag = max(c_tags.keys(), key=lambda x: c_tags[x])
 
     def tag(self, sent):
         """Tag a sentence.

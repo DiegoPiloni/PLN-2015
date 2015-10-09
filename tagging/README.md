@@ -51,3 +51,31 @@ Implementación de un Baseline Tagger.
 
 Se elige para cada palabra su etiqueta más frecuente observada en entrenamiento.
 Para las palabras desconocidas, se devuelve la etiqueta más frecuente observada en entrenamiento.
+
+
+Ejercicio 3)
+
+Resultados del Baseline Tagger.
+
+* Global Accuracy: 89.01%
+
+* Known Words Accuracy: 95.32%
+
+* Unknown Words Accuracy: 31.80%
+
+#### Confusion Matrix:
+
+La posición (x,y) indica la cantidad de veces que una palabra con el tag correcto de la columna x fue calificado incorrectamente por el tag de la fila y.
+
+|       | nc     | sp    | da    | vm    | aq    | np    | fc    | fp    | rg    | cc    |
+|-------|--------|-------|-------|-------|-------|-------|-------|-------|-------|-------|
+|**nc** |  0     | 45    | 143   | 2105  | 2041  | 1935  | 0     | 0     | 297   | 12    |
+|**sp** |  11    | 0     | 0     | 1     | 5     | 3     | 0     | 0     | 17    | 1     |
+|**da** |  1     | 0     | 0     | 0     | 0     | 0     | 0     | 0     | 0     | 0     |
+|**vm** |  90    | 0     | 0     | 0     | 198   | 0     | 0     | 0     | 0     | 0     |
+|**aq** |  469   | 0     | 0     | 160   | 0     | 1     | 0     | 0     | 29    | 0     |
+|**np** |  4     | 0     | 0     | 0     | 0     | 0     | 0     | 0     | 0     | 1     |
+|**fc** |  0     | 0     | 0     | 0     | 0     | 0     | 0     | 0     | 0     | 0     |
+|**fp **|  0     | 0     | 0     | 0     | 0     | 0     | 0     | 0     | 0     | 0     |
+|**rg** |  32    | 5     | 0     | 0     | 3     | 0     | 0     | 0     | 0     | 46    |
+|**cc** |  1     | 0     | 0     | 0     | 0     | 1     | 0     | 0     | 21    | 0     |
