@@ -54,6 +54,7 @@ Para las palabras desconocidas, se devuelve la etiqueta más frecuente observada
 
 
 Ejercicio 3)
+------------
 
 Resultados del Baseline Tagger.
 
@@ -76,6 +77,6 @@ La posición (x,y) indica la cantidad de veces que una palabra con el tag correc
 |**aq** |  469   | 0     | 0     | 160   | 0     | 1     | 0     | 0     | 29    | 0     |
 |**np** |  4     | 0     | 0     | 0     | 0     | 0     | 0     | 0     | 0     | 1     |
 |**fc** |  0     | 0     | 0     | 0     | 0     | 0     | 0     | 0     | 0     | 0     |
-|**fp**|  0     | 0     | 0     | 0     | 0     | 0     | 0     | 0     | 0     | 0     |
+|**fp** |  0     | 0     | 0     | 0     | 0     | 0     | 0     | 0     | 0     | 0     |
 |**rg** |  32    | 5     | 0     | 0     | 3     | 0     | 0     | 0     | 0     | 46    |
 |**cc** |  1     | 0     | 0     | 0     | 0     | 1     | 0     | 0     | 21    | 0     |
