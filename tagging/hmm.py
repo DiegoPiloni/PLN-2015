@@ -173,13 +173,21 @@ class ViterbiTagger:
                             pi_k_tag = pi_k_1_tags + [v]
                 if pi_k != float('-inf'):
                     pi[k][t[1:] + (v,)] = (pi_k, pi_k_tag)
-        #for i, d in pi.items():
-        #    print (i)
-        #    for t1, t2 in d.items():
-        #        print(t1, t2)
+        for i, d in pi.items():
+            print (i)
+            for t1, t2 in d.items():
+                print(t1, t2)
 
         self._pi = pi
-        max_t = max(pi[m].keys(), key=lambda x: pi[m][x][0] * hmm.trans_prob(stop, x))
+        max_p = float('-inf')
+        max_t = tuple()
+        for t in pi[m].keys():
+            trans_stop = hmm.trans_prob(stop, t)
+            if trans_stop != 0:
+                p = pi[m][t][0] * log2(trans_stop)
+                if p > max_p:
+                    max_p = p
+                    max_t = t
         tagging = pi[m][max_t][1]
         return tagging
 
@@ -238,9 +246,8 @@ class MLHMM(HMM):
                     n_gram = tuple(tag_sent[i:i+n])
                     self.trans_counts[n_gram] += 1
                     self.trans_counts[n_gram[:-1]] += 1
-        self.tgset.add(stop[0])
         self.len_vocab = len(self.vocab)
-        self.len_tgset = len(self.tgset)
+        self.len_tgset = len(self.tgset) + 1  # + '</s'>
 
         # probs
         for tag, word_counts in self.out_counts.items():
