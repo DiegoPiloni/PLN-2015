@@ -4,3 +4,4 @@
 *.pyc
 __pycache__/
 ancora/
+pln_2015.egg-info/
