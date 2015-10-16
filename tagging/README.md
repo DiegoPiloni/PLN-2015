@@ -127,6 +127,7 @@ Implementación de una MLHMM. Donde el HMM utilizado es el implementado en el ej
 ##### Confusion Matrix
 
 |       | nc     | sp    | da    | vm    | aq    | np    | fc    | fp    | rg    | cc    |
+|-------|--------|-------|-------|-------|-------|-------|-------|-------|-------|-------|
 |**nc** |  0     | 3     | 69    | 198   | 418   | 470   | 0     | 0     | 32    | 0     |
 |**sp** |  69    | 0     | 4     | 339   | 146   | 51    | 0     | 0     | 65    | 1     |
 |**da** |  168   | 13    | 0     | 86    | 98    | 37    | 0     | 0     | 25    | 0     |
