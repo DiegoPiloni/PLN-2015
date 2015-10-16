@@ -161,11 +161,11 @@ class ViterbiTagger:
             for v in tagset:
                 pi_k = float('-inf')
                 pi_k_tag = ""
+                out = hmm.out_prob(sent[k-1], v)
                 for t in pi[k-1]:
                     pi_k_1 = (pi[k-1][t][0])
                     pi_k_1_tags = pi[k-1][t][1]
                     trans = hmm.trans_prob(v, t)
-                    out = hmm.out_prob(sent[k-1], v)
                     if trans != 0 and out != 0:
                         s = pi_k_1 + log2(trans) + log2(out)
                         if s > pi_k:
@@ -173,10 +173,10 @@ class ViterbiTagger:
                             pi_k_tag = pi_k_1_tags + [v]
                 if pi_k != float('-inf'):
                     pi[k][t[1:] + (v,)] = (pi_k, pi_k_tag)
-        for i, d in pi.items():
-            print (i)
-            for t1, t2 in d.items():
-                print(t1, t2)
+        #for i, d in pi.items():
+        #    print (i)
+        #    for t1, t2 in d.items():
+        #        print(t1, t2)
 
         self._pi = pi
         max_p = float('-inf')
@@ -184,7 +184,7 @@ class ViterbiTagger:
         for t in pi[m].keys():
             trans_stop = hmm.trans_prob(stop, t)
             if trans_stop != 0:
-                p = pi[m][t][0] * log2(trans_stop)
+                p = pi[m][t][0] + log2(trans_stop)
                 if p > max_p:
                     max_p = p
                     max_t = t
@@ -295,12 +295,17 @@ class MLHMM(HMM):
         tag -- the tag.
         prev_tags -- tuple with the previous n-1 tags (optional only if n = 1).
         """
+        trans_p = 0
         if prev_tags in self.trans:
             if tag in self.trans[prev_tags]:
-                return self.trans[prev_tags][tag]
-        if self.addone:
-            return (1 / self.len_tgset)
-        return 0
+                trans_p = self.trans[prev_tags][tag]
+            else:
+                if self.addone:
+                    trans_p =  1 / (self.tcount(prev_tags) + self.len_tgset)
+        else:
+            if self.addone:
+                trans_p = (1 / self.len_tgset)
+        return trans_p
 
     def out_prob(self, word, tag):
         """Probability of a word given a tag.
@@ -309,8 +314,9 @@ class MLHMM(HMM):
         tag -- the tag.
         """
         out_p = 0
-        if word in self.out[tag]:
-            out_p = self.out[tag][word]
+        if not self.unknown(word):
+            if word in self.out[tag]:
+                out_p = self.out[tag][word]
         else:
             if self.addone:
                 out_p = 1 / self.len_vocab
