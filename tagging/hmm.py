@@ -161,32 +161,18 @@ class ViterbiTagger:
 
         for k in range(1, m+1):
             for v in tagset:
-                pi_k_p = float('-inf')
-                pi_k_tag = []
-                max_t = tuple()
                 out = hmm.out_prob(sent[k-1], v)
                 if out != 0:
-                    k_1_tuples = sorted(list(pi[k-1].keys()))
-                    for t in k_1_tuples:
+                    k_1_uples = sorted(list(pi[k-1].keys()))
+                    for t in k_1_uples:
                         pi_k_1_p = pi[k-1][t][0]
                         pi_k_1_tags = pi[k-1][t][1]
                         trans = hmm.trans_prob(v, t)
                         if trans != 0:
                             s = pi_k_1_p + log2(trans) + log2(out)
-                            if s > pi_k_p:
-                                max_t = t
-                                pi_k_p = s
-                                pi_k_tag = pi_k_1_tags + [v]
-                    if pi_k_p != float('-inf'):
-                        tv = (max_t + (v,))[1:]
-                        if pi_k_p > pi[k][tv][0]:
-                            pi[k][tv] = (pi_k_p, pi_k_tag)
-
-            # print("\nPI")
-            # for i, d in pi.items():
-            #    print (i)
-            #    for t1, t2 in d.items():
-            #       print(t1, t2)
+                            tv = (t + (v,))[1:]
+                            if s > pi[k][tv][0]:
+                                pi[k][tv] = (s, pi_k_1_tags + [v])
 
         self._pi = pi
         max_p = float('-inf')
