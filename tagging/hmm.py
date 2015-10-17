@@ -1,6 +1,7 @@
 from math import log2
 from collections import defaultdict
 
+
 class HMM:
 
     def __init__(self, n, tagset, trans, out):
@@ -150,8 +151,9 @@ class ViterbiTagger:
         """
         hmm = self.hmm
         n = hmm.n  # n-gram model
-        tagset = hmm.tagset()
-        pi = defaultdict(lambda:defaultdict(lambda: (0,list())))
+        tagset = list(hmm.tagset())
+        tagset.sort()
+        pi = defaultdict(lambda: defaultdict(lambda: (float('-inf'), list())))
         m = len(sent)
         start = ("<s>",)
         stop = "</s>"
@@ -159,29 +161,37 @@ class ViterbiTagger:
 
         for k in range(1, m+1):
             for v in tagset:
-                pi_k = float('-inf')
-                pi_k_tag = ""
+                pi_k_p = float('-inf')
+                pi_k_tag = []
+                max_t = tuple()
                 out = hmm.out_prob(sent[k-1], v)
-                for t in pi[k-1]:
-                    pi_k_1 = (pi[k-1][t][0])
-                    pi_k_1_tags = pi[k-1][t][1]
-                    trans = hmm.trans_prob(v, t)
-                    if trans != 0 and out != 0:
-                        s = pi_k_1 + log2(trans) + log2(out)
-                        if s > pi_k:
-                            pi_k = s
-                            pi_k_tag = pi_k_1_tags + [v]
-                if pi_k != float('-inf'):
-                    pi[k][t[1:] + (v,)] = (pi_k, pi_k_tag)
-        #for i, d in pi.items():
-        #    print (i)
-        #    for t1, t2 in d.items():
-        #        print(t1, t2)
+                if out != 0:
+                    k_1_tuples = sorted(list(pi[k-1].keys()))
+                    for t in k_1_tuples:
+                        pi_k_1_p = pi[k-1][t][0]
+                        pi_k_1_tags = pi[k-1][t][1]
+                        trans = hmm.trans_prob(v, t)
+                        if trans != 0:
+                            s = pi_k_1_p + log2(trans) + log2(out)
+                            if s > pi_k_p:
+                                max_t = t
+                                pi_k_p = s
+                                pi_k_tag = pi_k_1_tags + [v]
+                    if pi_k_p != float('-inf'):
+                        tv = (max_t + (v,))[1:]
+                        if pi_k_p > pi[k][tv][0]:
+                            pi[k][tv] = (pi_k_p, pi_k_tag)
+
+            # print("\nPI")
+            # for i, d in pi.items():
+            #    print (i)
+            #    for t1, t2 in d.items():
+            #       print(t1, t2)
 
         self._pi = pi
         max_p = float('-inf')
         max_t = tuple()
-        for t in pi[m].keys():
+        for t in sorted(list(pi[m].keys())):
             trans_stop = hmm.trans_prob(stop, t)
             if trans_stop != 0:
                 p = pi[m][t][0] + log2(trans_stop)
@@ -193,7 +203,7 @@ class ViterbiTagger:
 
 
 class MLHMM(HMM):
- 
+
     def __init__(self, n, tagged_sents, addone=True):
         """
         n -- order of the model.
@@ -204,8 +214,8 @@ class MLHMM(HMM):
         self.tagged_sents = tagged_sents
         self.addone = addone
 
-        self.trans_counts = defaultdict(int)
         self.tag_counts = defaultdict(int)
+        self.trans_counts = defaultdict(int)
         self.out_counts = defaultdict(lambda: defaultdict(int))
         self.trans = defaultdict(lambda: defaultdict(float))  # HMM
         self.out = defaultdict(lambda: defaultdict(float))    # HMM
@@ -217,14 +227,6 @@ class MLHMM(HMM):
         self.out_counts = dict(self.out_counts)
         self.out = dict(self.out)
         self.trans = dict(self.trans)
-
-        # c_tags for eval
-        self.c_tags = c_tags = defaultdict(int)
-        for sent in tagged_sents:
-            for word, tag in sent:
-                c_tags[tag] += 1
-
-
 
     def _train(self):
         """Train counts, trans_p, out_p, vocab and tagset"""
@@ -258,26 +260,22 @@ class MLHMM(HMM):
             if (len(n_gram)) == n:
                 n_gram_count = self.trans_counts[n_gram]
                 n_1_gram_count = self.trans_counts[n_gram[:-1]]
-                if not self.addone:
-                    self.trans[n_gram[:-1]][n_gram[-1]] = n_gram_count / n_1_gram_count
-                else:
-                    vt = self.len_tgset
-                    trans = (n_gram_count + 1) / (n_1_gram_count + vt)
-                    self.trans[n_gram[:-1]][n_gram[-1]] = trans
+                q = n_gram_count / n_1_gram_count
+                self.trans[n_gram[:-1]][n_gram[-1]] = q
 
     def tcount(self, tokens):
         """Count for a k-gram for k <= n.
- 
+
         tokens -- the k-gram tuple.
         """
         tcount = 0
         if tokens in self.trans_counts:
             tcount = self.trans_counts[tokens]
         return tcount
- 
+
     def unknown(self, w):
         """Check if a word is unknown for the model.
- 
+
         w -- the word.
         """
         unknown = True
@@ -296,15 +294,12 @@ class MLHMM(HMM):
         prev_tags -- tuple with the previous n-1 tags (optional only if n = 1).
         """
         trans_p = 0
-        if prev_tags in self.trans:
-            if tag in self.trans[prev_tags]:
-                trans_p = self.trans[prev_tags][tag]
-            else:
-                if self.addone:
-                    trans_p =  1 / (self.tcount(prev_tags) + self.len_tgset)
+        tags_c = self.tcount(prev_tags + (tag,))
+        prev_tags_c = self.tcount(prev_tags)
+        if self.addone:
+            trans_p = (tags_c + 1) / (prev_tags_c + self.len_tgset)
         else:
-            if self.addone:
-                trans_p = (1 / self.len_tgset)
+            trans_p = tags_c / prev_tags_c
         return trans_p
 
     def out_prob(self, word, tag):

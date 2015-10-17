@@ -30,10 +30,10 @@ if __name__ == '__main__':
 
     # train the model
     if opts['-m'] == 'base':
-      model = BaselineTagger(sents)
+        model = BaselineTagger(sents)
     else:
-      n = int(opts['-n'])
-      model = MLHMM(n, sents)
+        n = int(opts['-n'])
+        model = MLHMM(n, sents)
 
     # save it
     filename = opts['-o']
