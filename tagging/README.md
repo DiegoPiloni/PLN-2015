@@ -56,6 +56,26 @@ Para las palabras desconocidas, se devuelve la etiqueta más frecuente observada
 Ejercicio 3)
 ------------
 
+### Baseline Tagger
+
+### Para entrenar:
+
+```
+tagging/scripts/train.py -m base -o <file>
+```
+
+* -o: Archivo de salida con el Tagger.
+
+### Para evaluar:
+
+```
+tagging/scripts/eval.py -i <file>
+```
+
+* -i: Archivo con el Baseline Tagger
+
+
+
 #### Resultados del Baseline Tagger.
 
 * Global Accuracy: 89.01%
@@ -92,6 +112,23 @@ Ejercicio 5)
 
 Implementación de una MLHMM. Donde el HMM utilizado es el implementado en el ejercicio 4.
 
+### Para entrenar:
+
+```
+tagging/scripts/train.py -m mlhmm -n <n> -o <file>
+```
+
+* -n: Modelo de n-gramas
+* -o: Archivo de salida con el Tagger.
+
+### Para evaluar:
+
+```
+tagging/scripts/eval.py -i <file>
+```
+
+* -i: Archivo con el MLHMM Tagger
+
 
 ### Resultados del MLHMM:
 
@@ -109,13 +146,13 @@ Implementación de una MLHMM. Donde el HMM utilizado es el implementado en el ej
 
 |       | nc     | sp    | da    | vm    | aq    | np    | fc    | fp    | rg    | cc    |
 |-------|--------|-------|-------|-------|-------|-------|-------|-------|-------|-------|
-|**nc   |  0     | 45    | 143   | 2105  | 2041  | 1935  | 0     | 0     | 297   | 12    |
-|**sp   |  11    | 0     | 0     | 1     | 5     | 3     | 0     | 0     | 17    | 1     |
-|**da   |  1     | 0     | 0     | 0     | 0     | 0     | 0     | 0     | 0     | 0     |
-|**vm   |  88    | 0     | 0     | 0     | 183   | 0     | 0     | 0     | 0     | 0     |
-|**aq   |  471   | 0     | 0     | 167   | 0     | 1     | 0     | 0     | 29    | 0     |
-|**np   |  4     | 0     | 0     | 0     | 0     | 0     | 0     | 0     | 0     | 1     |
-|**fc   |  0     | 0     | 0     | 0     | 0     | 0     | 0     | 0     | 0     | 0     |
+|**nc** |  0     | 45    | 143   | 2105  | 2041  | 1935  | 0     | 0     | 297   | 12    |
+|**sp** |  11    | 0     | 0     | 1     | 5     | 3     | 0     | 0     | 17    | 1     |
+|**da** |  1     | 0     | 0     | 0     | 0     | 0     | 0     | 0     | 0     | 0     |
+|**vm** |  88    | 0     | 0     | 0     | 183   | 0     | 0     | 0     | 0     | 0     |
+|**aq** |  471   | 0     | 0     | 167   | 0     | 1     | 0     | 0     | 29    | 0     |
+|**np** |  4     | 0     | 0     | 0     | 0     | 0     | 0     | 0     | 0     | 1     |
+|**fc** |  0     | 0     | 0     | 0     | 0     | 0     | 0     | 0     | 0     | 0     |
 |**fp** |  0     | 0     | 0     | 0     | 0     | 0     | 0     | 0     | 0     | 0     |
 |**rg** |  32    | 5     | 0     | 0     | 3     | 0     | 0     | 0     | 0     | 46    |
 |**cc** |  1     | 0     | 0     | 0     | 0     | 1     | 0     | 0     | 21    | 0     |
@@ -182,6 +219,7 @@ Implementación de una MLHMM. Donde el HMM utilizado es el implementado en el ej
 ##### Confusion Matrix
 
 |       | nc     | sp    | da    | vm    | aq    | np    | fc    | fp    | rg    | cc    |
+|-------|--------|-------|-------|-------|-------|-------|-------|-------|-------|-------|
 |**nc** |  0     | 1     | 74    | 241   | 454   | 515   | 0     | 0     | 43    | 0     |
 |**sp** |  42    | 0     | 3     | 309   | 93    | 40    | 0     | 0     | 60    | 1     |
 |**da** |  137   | 13    | 0     | 70    | 66    | 39    | 0     | 0     | 27    | 1     |
