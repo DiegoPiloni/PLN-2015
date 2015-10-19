@@ -91,4 +91,4 @@ class PrevWord(Feature):
             return 'BOS'
         else:
             h1 = History(sent, prev_tags, i - 1)
-            return f(h1)
+            return str(f(h1))
