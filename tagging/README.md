@@ -141,6 +141,13 @@ tagging/scripts/eval.py -i <file>
 
 * Unknown Words Accuracy: 31.80%
 
+##### Tiempo de evaluación:
+
+* real    0m7.090s
+
+* user    0m6.937s
+
+* sys     0m0.124s
 
 ##### Confusion Matrix
 
@@ -166,6 +173,13 @@ tagging/scripts/eval.py -i <file>
 
 * Unknown Words Accuracy: 48.42%
 
+##### Tiempo de evaluación:
+
+* real    0m13.513s
+
+* user    0m13.408s
+
+* sys     0m0.100s
 
 ##### Confusion Matrix
 
@@ -191,9 +205,15 @@ tagging/scripts/eval.py -i <file>
 
 * Unknown Words Accuracy: 52.31%
 
+##### Tiempo de evaluación:
+
+* real    0m50.929s
+
+* user    0m50.689s
+
+* sys     0m0.248s
 
 ##### Confusion Matrix
-
 
 |       | nc     | sp    | da    | vm    | aq    | np    | fc    | fp    | rg    | cc    |
 |-------|--------|-------|-------|-------|-------|-------|-------|-------|-------|-------|
@@ -215,6 +235,14 @@ tagging/scripts/eval.py -i <file>
 * Known Words Accuracy: 97.44%
 
 * Unknown Words Accuracy: 54.16%
+
+##### Tiempo de evaluación:
+
+* real    4m40.195s
+
+* user    4m39.519s
+
+* sys     0m0.776s
 
 ##### Confusion Matrix
 
