@@ -1,18 +1,16 @@
+from collections import defaultdict
 from featureforge.vectorizer import Vectorizer
 from sklearn.linear_model import LogisticRegression
 from sklearn.naive_bayes import MultinomialNB
 from sklearn.svm import LinearSVC
 from sklearn.pipeline import Pipeline
-from tagging.features import *
-from collections import namedtuple, defaultdict
-
-
-History = namedtuple('History', 'sent prev_tags i')
+from tagging.features import (History, word_lower, word_istitle, word_isupper,
+                              word_isdigit, NPrevTags, PrevWord)
 
 
 class MEMM:
 
-    def __init__(self, n, tagged_sents, classifier='logistic_regression'):
+    def __init__(self, n, tagged_sents, classifier='lr'):
         """
         n -- order of the model.
         tagged_sents -- list of sentences, each one being a list of pairs.
@@ -21,9 +19,9 @@ class MEMM:
         self.tagged_sents = tagged_sents
 
         # posible classifiers
-        classifiers = {'logistic_regression': LogisticRegression(), \
-                       'multinomial_nb': MultinomialNB(), \
-                       'linear_svc': LinearSVC()}
+        classifiers = {'lr': LogisticRegression(),
+                       'mnb': MultinomialNB(),
+                       'lsvc': LinearSVC()}
 
         self.vocab = set()
         self.tag_counts = defaultdict(int)
@@ -35,13 +33,13 @@ class MEMM:
         # Features
         self.features = [word_lower, word_istitle, word_isupper, word_isdigit]
         prev_word = [PrevWord(f) for f in self.features]
-        n_prev_tags = [NPrevTags(i) for i in range(1,n)]
+        n_prev_tags = [NPrevTags(i) for i in range(1, n)]
         self.features += n_prev_tags + prev_word
 
         # Pipeline for tag classifier
-        self.tag_clf = Pipeline([('vect', Vectorizer(self.features)), \
-                                 ('clf', classifiers[classifier]), \
-                                ])
+        self.tag_clf = Pipeline([('vect', Vectorizer(self.features)),
+                                 ('clf', classifiers[classifier]),
+                                 ])
 
         sents_histories = self.sents_histories(tagged_sents)
         sents_tags = self.sents_tags(tagged_sents)

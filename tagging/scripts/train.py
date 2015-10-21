@@ -8,12 +8,12 @@ Options:
   -m <model>        Model to use [default: base]:
                         base: Baseline
                         mlhmm: Max. Likelihood Hidden Markov Model
-                        memm: Max. Entropy Markov Model 
+                        memm: Max. Entropy Markov Model
   -n <n>            n-gram for mlhmm/memm.
   -c <classifier> Classifier to use for memm [default: logistic_regression]
-                        logistic_regression: Max ent. classifier
-                        multinomial_nb: Multinomial Naive Bayes
-                        linear_svc: Linear Support Vector Classification
+                        lr: Max ent. classifier (Logistic Regression)
+                        mnb: Multinomial Naive Bayes
+                        lsvc: Linear Support Vector Classification
   -o <file>         Output model file.
   -h --help         Show this screen.
 """
@@ -41,9 +41,9 @@ if __name__ == '__main__':
         model = BaselineTagger(sents)
     elif opts['-m'] == "memm":
         n = int(opts['-n'])
-        clf = "logistic_regression"
+        clf = "lr"
         if opts['-c']:
-          clf = opts['-c']
+            clf = opts['-c']
         model = MEMM(n, sents, clf)
     elif opts['-m'] == "mlhmm":
         n = int(opts['-n'])
