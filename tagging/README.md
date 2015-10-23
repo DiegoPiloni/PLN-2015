@@ -164,10 +164,6 @@ tagging/scripts/eval.py -i <file>
 |**rg** |  32    | 5     | 0     | 0     | 3     | 0     | 0     | 0     | 0     | 46    |
 |**cc** |  1     | 0     | 0     | 0     | 0     | 1     | 0     | 0     | 21    | 0     |
 
-##### Confusion Matrix Plot:
-
-![alt text](https://github.com/DiegoPiloni/PLN-2015/tree/practico2/tagging/ConfMatr/lr_1.png "Logistic Regression 1")
-
 
 #### 2-grams:
 
@@ -200,9 +196,6 @@ tagging/scripts/eval.py -i <file>
 |**rg** |  44    | 16    | 0     | 57    | 53    | 23    | 0     | 0     | 0     | 51    |
 |**cc** |  2     | 4     | 0     | 2     | 1     | 1     | 0     | 0     | 22    | 0     |
 
-##### Confusion Matrix Plot:
-
-![alt text](https://github.com/DiegoPiloni/PLN-2015/tree/practico2/tagging/ConfMatr/lr_2.png "Logistic Regression 2")
 
 #### 3-grams:
 
@@ -235,10 +228,6 @@ tagging/scripts/eval.py -i <file>
 |**rg** |  40    | 14    | 0     | 62    | 54    | 52    | 0     | 0     | 0     | 60    |
 |**cc** |  7     | 3     | 0     | 12    | 4     | 4     | 0     | 0     | 21    | 0     |
 
-##### Confusion Matrix Plot:
-
-![alt text](https://github.com/DiegoPiloni/PLN-2015/tree/practico2/tagging/ConfMatr/lr_3.png "Logistic Regression 3")
-
 #### 4-grams
 
 * Global Accuracy: 93.14%
@@ -269,10 +258,6 @@ tagging/scripts/eval.py -i <file>
 |**fp** |  6     | 0     | 1     | 0     | 2     | 1     | 0     | 0     | 0     | 0     |
 |**rg** |  39    | 16    | 0     | 64    | 61    | 42    | 0     | 0     | 0     | 58    |
 |**cc** |  7     | 3     | 0     | 12    | 13    | 11    | 0     | 0     | 29    | 0     |
-
-##### Confusion Matrix Plot:
-
-![alt text](https://github.com/DiegoPiloni/PLN-2015/tree/practico2/tagging/ConfMatr/lr_4.png "Logistic Regression 4")
 
 
 Ejercicio 6)
@@ -351,6 +336,9 @@ tagging/scripts/eval.py -i <file>
 | **rg** |  16    | 4     | 0     | 0     | 2     | 0     | 0     | 0     | 0     | 44    |
 | **cc** |  1     | 0     | 0     | 0     | 0     | 1     | 0     | 0     | 21    | 0     |
 
+##### Confusion Matrix Plot:
+
+![LR1](https://github.com/DiegoPiloni/PLN-2015/tree/practico2/tagging/ConfMatr/lr_1.png "Logistic Regression 1")
 
 #### 2-grams
 
@@ -383,6 +371,10 @@ tagging/scripts/eval.py -i <file>
 | **rg** |  11    | 4     | 0     | 0     | 3     | 0     | 0     | 0     | 0     | 45    |
 | **cc** |  0     | 0     | 0     | 0     | 0     | 1     | 0     | 0     | 21    | 0     |
 
+##### Confusion Matrix Plot:
+
+![LR2](https://github.com/DiegoPiloni/PLN-2015/tree/practico2/tagging/ConfMatr/lr_2.png "Logistic Regression 2")
+
 #### 3-grams
 
 * Global Accuracy: 92.18%
@@ -413,6 +405,11 @@ tagging/scripts/eval.py -i <file>
 | **fp** |  0     | 0     | 0     | 0     | 0     | 0     | 0     | 0     | 0     | 0     |
 | **rg** |  11    | 4     | 0     | 0     | 3     | 0     | 0     | 0     | 0     | 45    |
 | **cc** |  0     | 0     | 0     | 0     | 0     | 1     | 0     | 0     | 21    | 0     |
+
+
+##### Confusion Matrix Plot:
+
+![LR3](https://github.com/DiegoPiloni/PLN-2015/tree/practico2/tagging/ConfMatr/lr_3.png "Logistic Regression 3")
 
 #### 4-grams
 
@@ -445,6 +442,9 @@ tagging/scripts/eval.py -i <file>
 | **rg** |  11    | 4     | 0     | 0     | 4     | 0     | 0     | 0     | 0     | 44    |
 | **cc** |  0     | 0     | 0     | 0     | 0     | 1     | 0     | 0     | 21    | 0     |
 
+##### Confusion Matrix Plot:
+
+![LR4](https://github.com/DiegoPiloni/PLN-2015/tree/practico2/tagging/ConfMatr/lr_4.png "Logistic Regression 4")
 
 ### Linear SVC
 
