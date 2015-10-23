@@ -1,4 +1,5 @@
 from collections import defaultdict
+import itertools
 from featureforge.vectorizer import Vectorizer
 from sklearn.linear_model import LogisticRegression
 from sklearn.naive_bayes import MultinomialNB
@@ -41,8 +42,8 @@ class MEMM:
                                  ('clf', classifiers[classifier]),
                                  ])
 
-        sents_histories = self.sents_histories(tagged_sents)
-        sents_tags = self.sents_tags(tagged_sents)
+        sents_histories = list(self.sents_histories(tagged_sents))
+        sents_tags = list(self.sents_tags(tagged_sents))
 
         self.tag_clf = self.tag_clf.fit(sents_histories, sents_tags)
 
@@ -52,10 +53,7 @@ class MEMM:
 
         tagged_sents -- the corpus (a list of sentences)
         """
-        hs = list()
-        for tagged_sent in tagged_sents:
-            hs += self.sent_histories(tagged_sent)
-        return hs
+        return itertools.chain(*(self.sent_histories(ts) for ts in tagged_sents))
 
     def sent_histories(self, tagged_sent):
         """
@@ -71,7 +69,7 @@ class MEMM:
         hs = list()
         for i in range(len(word_sent)):
             hs.append(History(word_sent, tag_sent[i:i+n-1], i))
-        return hs
+        return iter(hs)
 
     def sents_tags(self, tagged_sents):
         """
@@ -79,10 +77,7 @@ class MEMM:
 
         tagged_sents -- the corpus (a list of sentences)
         """
-        tags = tuple()
-        for tagged_sent in tagged_sents:
-            tags += self.sent_tags(tagged_sent)
-        return tags
+        return itertools.chain(*(self.sent_tags(ts) for ts in tagged_sents))
 
     def sent_tags(self, tagged_sent):
         """
@@ -90,8 +85,7 @@ class MEMM:
 
         tagged_sent -- the tagged sentence (a list of pairs (word, tag)).
         """
-        word_sent, tag_sent = zip(*tagged_sent)
-        return tag_sent
+        return (t for w, t in tagged_sent)
 
     def tag(self, sent):
         """Tag a sentence.

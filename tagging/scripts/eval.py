@@ -11,7 +11,8 @@ Options:
 from docopt import docopt
 import pickle
 import sys
-
+import numpy as np
+import matplotlib.pyplot as plt
 from collections import defaultdict
 from corpus.ancora import SimpleAncoraCorpusReader
 
@@ -22,6 +23,20 @@ def progress(msg, width=None):
         width = len(msg)
     print('\b' * width + msg, end='')
     sys.stdout.flush()
+
+def plot_confusion_matrix(cm, title='Confusion matrix', cmap=plt.cm.Blues):
+    np.set_printoptions(precision=2)
+    plt.figure()
+    plt.imshow(cm, interpolation='nearest', cmap=cmap)
+    plt.title(title)
+    plt.colorbar()
+    tick_marks = np.arange(len(mft))
+    plt.xticks(tick_marks, list(zip(*mft))[0], rotation=45)
+    plt.yticks(tick_marks, list(zip(*mft))[0])
+    plt.tight_layout()
+    plt.xlabel('True label')
+    plt.ylabel('Predicted label')
+    plt.show()
 
 
 if __name__ == '__main__':
@@ -44,6 +59,7 @@ if __name__ == '__main__':
     u_hits, u_total = 0, 0
     acc, k_acc, u_acc = 0, 0, 0
     c_tags = list(model.tag_counts.items())  # counted tags
+    tags = list(zip(*c_tags))[0]
     confusion = defaultdict(lambda: defaultdict(int))  # confusion "matrix"
     n = len(sents)
 
@@ -98,6 +114,8 @@ if __name__ == '__main__':
         conf_matrix.append([])
         for j, (tagj, _) in enumerate(mft):
             conf_matrix[i].append(confusion[tagj][tagi])
+
+    plot_confusion_matrix(np.array(conf_matrix))
 
     print("\nConfusion Matrix")
     for tag, _ in mft:
