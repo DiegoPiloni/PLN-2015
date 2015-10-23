@@ -338,7 +338,7 @@ tagging/scripts/eval.py -i <file>
 
 ##### Confusion Matrix Plot:
 
-![LR1](https://github.com/DiegoPiloni/PLN-2015/tree/practico2/tagging/ConfMatr/lr_1.png "Logistic Regression 1")
+![LR1](https://github.com/DiegoPiloni/PLN-2015/raw/practico2/tagging/ConfMatr/lr_1.png "Logistic Regression 1")
 
 #### 2-grams
 
@@ -373,7 +373,7 @@ tagging/scripts/eval.py -i <file>
 
 ##### Confusion Matrix Plot:
 
-![LR2](https://github.com/DiegoPiloni/PLN-2015/tree/practico2/tagging/ConfMatr/lr_2.png "Logistic Regression 2")
+![LR2](https://github.com/DiegoPiloni/PLN-2015/raw/practico2/tagging/ConfMatr/lr_2.png "Logistic Regression 2")
 
 #### 3-grams
 
@@ -409,7 +409,7 @@ tagging/scripts/eval.py -i <file>
 
 ##### Confusion Matrix Plot:
 
-![LR3](https://github.com/DiegoPiloni/PLN-2015/tree/practico2/tagging/ConfMatr/lr_3.png "Logistic Regression 3")
+![LR3](https://github.com/DiegoPiloni/PLN-2015/raw/practico2/tagging/ConfMatr/lr_3.png "Logistic Regression 3")
 
 #### 4-grams
 
@@ -444,7 +444,7 @@ tagging/scripts/eval.py -i <file>
 
 ##### Confusion Matrix Plot:
 
-![LR4](https://github.com/DiegoPiloni/PLN-2015/tree/practico2/tagging/ConfMatr/lr_4.png "Logistic Regression 4")
+![LR4](https://github.com/DiegoPiloni/PLN-2015/raw/practico2/tagging/ConfMatr/lr_4.png "Logistic Regression 4")
 
 ### Linear SVC
 
