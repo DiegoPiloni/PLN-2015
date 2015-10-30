@@ -1,11 +1,13 @@
 """Evaulate a parser.
 
 Usage:
-  eval.py -i <file>
+  eval.py -i <file> [-m <m>] [-n <n>]
   eval.py -h | --help
 
 Options:
   -i <file>     Parsing model file.
+  -m <m>        Only evaluate sents with length <= m
+  -n <n>        Only evaluate the first n sents.
   -h --help     Show this screen.
 """
 from docopt import docopt
@@ -39,11 +41,22 @@ if __name__ == '__main__':
     corpus = SimpleAncoraCorpusReader('ancora/ancora-2.0/', files)
     parsed_sents = list(corpus.parsed_sents())
 
-    print('Parsing...')
-    hits, total_gold, total_model = 0, 0, 0
+    # check -n option
+    if opts['-n'] is not None:
+        n = int(opts['-n'])
+        parsed_sents = parsed_sents[:n]
+
+    # check -m option
+    if opts['-m'] is not None:
+        m = int(opts['-m'])
+        parsed_sents = [ps for ps in parsed_sents if len(ps.leaves()) <= m]
+
     n = len(parsed_sents)
-    format_str = '{:3.1f}% ({}/{}) (P={:2.2f}%, R={:2.2f}%, F1={:2.2f}%)'
-    progress(format_str.format(0.0, 0, n, 0.0, 0.0, 0.0))
+
+    print('Parsing...')
+    lab_hits, unlab_hits, total_gold, total_model = 0, 0, 0, 0
+    format_str = '{:3.1f}% ({}/{}) (LP={:2.2f}%, LR={:2.2f}%, LF1={:2.2f}%) (ULP={:2.2f}%, ULR={:2.2f}%, ULF1={:2.2f}%)'
+    progress(format_str.format(0.0, 0, n, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0))
     for i, gold_parsed_sent in enumerate(parsed_sents):
         tagged_sent = gold_parsed_sent.pos()
 
@@ -51,22 +64,38 @@ if __name__ == '__main__':
         model_parsed_sent = model.parse(tagged_sent)
 
         # compute labeled scores
-        gold_spans = spans(gold_parsed_sent, unary=False)
-        model_spans = spans(model_parsed_sent, unary=False)
-        hits += len(gold_spans & model_spans)
-        total_gold += len(gold_spans)
-        total_model += len(model_spans)
+        lab_gold_spans = spans(gold_parsed_sent, unary=False)
+        lab_model_spans = spans(model_parsed_sent, unary=False)
+        lab_hits += len(lab_gold_spans & lab_model_spans)
+
+        # compute unlabeled scores
+        unlab_gold_spans = set([s[1:] for s in lab_gold_spans])
+        unlab_model_spans = set([s[1:] for s in lab_model_spans])
+        unlab_hits += len(unlab_gold_spans & unlab_model_spans)
+
+        # total spans
+        total_gold += len(lab_gold_spans)
+        total_model += len(lab_model_spans)
 
         # compute labeled partial results
-        prec = float(hits) / total_model * 100
-        rec = float(hits) / total_gold * 100
-        f1 = 2 * prec * rec / (prec + rec)
+        lab_prec = float(lab_hits) / total_model * 100
+        lab_rec = float(lab_hits) / total_gold * 100
+        lab_f1 = 2 * lab_prec * lab_rec / (lab_prec + lab_rec)
 
-        progress(format_str.format(float(i+1) * 100 / n, i+1, n, prec, rec, f1))
+        # compute unlabeled partial results
+        unlab_prec = float(unlab_hits) / total_model * 100
+        unlab_rec = float(unlab_hits) / total_gold * 100
+        unlab_f1 = 2 * unlab_prec * unlab_rec / (unlab_prec + unlab_rec)
+
+        progress(format_str.format(float(i+1) * 100 / n, i+1, n, lab_prec, lab_rec, lab_f1, unlab_prec, unlab_rec, unlab_f1))
 
     print('')
     print('Parsed {} sentences'.format(n))
     print('Labeled')
-    print('  Precision: {:2.2f}% '.format(prec))
-    print('  Recall: {:2.2f}% '.format(rec))
-    print('  F1: {:2.2f}% '.format(f1))
+    print('  Precision: {:2.2f}% '.format(lab_prec))
+    print('  Recall: {:2.2f}% '.format(lab_rec))
+    print('  F1: {:2.2f}% '.format(lab_f1))
+    print('Unlabeled')
+    print('  Precision: {:2.2f}% '.format(unlab_prec))
+    print('  Recall: {:2.2f}% '.format(unlab_rec))
+    print('  F1: {:2.2f}% '.format(unlab_f1))

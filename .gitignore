@@ -1,0 +1,8 @@
+*~
+*.sublime-workspace
+*.sublime-project
+*.pyc
+__pycache__/
+ancora/
+Models/
+pln_2015.egg-info/
