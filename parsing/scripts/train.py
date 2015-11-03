@@ -5,10 +5,11 @@ Usage:
   train.py -h | --help
 
 Options:
-  -m <model>    Model to use [default: flat]:
+  -m <model>    Model to use [default: upcfg]:
                   flat: Flat trees
                   rbranch: Right branching trees
                   lbranch: Left branching trees
+                  upcfg: Unlexicalized Prob. Context Free Grammar
   -o <file>     Output model file.
   -h --help     Show this screen.
 """
@@ -19,11 +20,14 @@ from corpus.ancora import SimpleAncoraCorpusReader
 
 from parsing.baselines import Flat, RBranch, LBranch
 
+from parsing.upcfg import UPCFG
+
 
 models = {
     'flat': Flat,
     'rbranch': RBranch,
     'lbranch': LBranch,
+    'upcfg': UPCFG
 }
 
 

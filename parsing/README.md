@@ -13,7 +13,6 @@ Parsed 1444 sentences
 
 #### Flat:
 
-
 * Labeled
   * Precision: 99.93%
   * Recall: 14.57%
