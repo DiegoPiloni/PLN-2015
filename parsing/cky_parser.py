@@ -28,9 +28,10 @@ class CKYParser:
         nonlexical_productions = [p for p in prods if p.is_nonlexical()]
         self._nonlexical_productions = defaultdict(list)
         for p in nonlexical_productions:
-            self._nonlexical_productions[p.lhs()].append(p)
+            rhs0 = p.rhs()[0].symbol()
+            rhs1 = p.rhs()[1].symbol()
+            self._nonlexical_productions[(rhs0, rhs1)].append(p)
 
-        self._non_terminals = set(p.lhs() for p in prods)
         self._pi = defaultdict(dict)  # pi for each (X, i, j)
         self._bp = defaultdict(dict)  # backpointers for each (X, i, j)
 
@@ -41,7 +42,6 @@ class CKYParser:
         """
         n = len(sent)
         start = self._start.symbol()
-        non_terminals = self._non_terminals
         lexical_prod = self._lexical_productions
         nonlexical_prod = self._nonlexical_productions
 
@@ -60,31 +60,29 @@ class CKYParser:
         for l in range(1, n):
             for i in range(1, n-l+1):
                 j = i + l
-                for x in non_terminals:
-                    # nonlexical productions with lhs x
-                    x_prod = nonlexical_prod[x]
-                    x = x.symbol()  # str representation
-                    pi_ijx = float('-inf')
-                    for prod in x_prod:
+                for s in range(i, j):
+                    rhs0 = pi[(i, s)].keys()
+                    rhs1 = pi[(s+1, j)].keys()
+                    prods = []
+                    for r0 in rhs0:
+                        for r1 in rhs1:
+                            prods += nonlexical_prod[(r0, r1)]
+                    for prod in prods:
                         rhs = prod.rhs()
+                        x = prod.lhs().symbol()
+                        if x not in pi[(i, j)]:
+                            pi[(i, j)][x] = float('-inf')
                         y = rhs[0].symbol()
                         z = rhs[1].symbol()
                         q_xyz = prod.logprob()
-                        for s in range(i, j):
-                            pi_split1 = float('-inf')
-                            pi_split2 = float('-inf')
-                            if y in pi[(i, s)]:
-                                pi_split1 = pi[(i, s)][y]
-                            if z in pi[(s+1, j)]:
-                                pi_split2 = pi[(s+1, j)][z]
-                            pi_xyz_s = q_xyz + pi_split1 + pi_split2
-                            if pi_xyz_s > pi_ijx:
-                                pi_ijx = pi_xyz_s
-                                ltree = bp[(i, s)][y]
-                                rtree = bp[(s+1, j)][z]
-                    if pi_ijx != float('-inf'):
-                        pi[(i, j)][x] = pi_ijx
-                        bp[(i, j)][x] = Tree(x, [ltree, rtree])
+                        pi_split1 = pi[(i, s)][y]
+                        pi_split2 = pi[(s+1, j)][z]
+                        pi_xyz_s = q_xyz + pi_split1 + pi_split2
+                        if pi_xyz_s > pi[(i, j)][x]:
+                            pi[(i, j)][x] = pi_xyz_s
+                            ltree = bp[(i, s)][y]
+                            rtree = bp[(s+1, j)][z]
+                            bp[(i, j)][x] = Tree(x, [ltree, rtree])
 
         self._pi = pi
         self._bp = bp
