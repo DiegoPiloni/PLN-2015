@@ -9,7 +9,7 @@ class UPCFG:
     """Unlexicalized PCFG.
     """
 
-    def __init__(self, parsed_sents, start='sentence'):
+    def __init__(self, parsed_sents, start='sentence', horzMarkov=None):
         """
         parsed_sents -- list of training trees.
         """
@@ -21,7 +21,7 @@ class UPCFG:
         self.lhs_counts = lhs_counts = defaultdict(int)
 
         for t in uparsed_sents:
-            t.chomsky_normal_form()
+            t.chomsky_normal_form(horzMarkov=horzMarkov)
             t.collapse_unary(collapsePOS=True, collapseRoot=True)
             for prod in t.productions():
                 pcounts[prod] += 1
@@ -48,8 +48,8 @@ class UPCFG:
         start = self._start.symbol()
         try:
             parsed_sent = self.parser.parse(tags)[1]
-            parsed_sent = lexicalize(parsed_sent, sent)
             parsed_sent.un_chomsky_normal_form()
+            parsed_sent = lexicalize(parsed_sent, sent)
         except NotInLangError:
             parsed_sent = Tree(start, [Tree(t, [w]) for w, t in tagged_sent])
         return parsed_sent

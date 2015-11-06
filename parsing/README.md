@@ -110,3 +110,71 @@ tagging/scripts/eval.py -i <file>
 * real  3m12.866s
 * user  3m12.289s
 * sys 0m0.572s
+
+Ejercicio 4)
+------------
+
+Posibilidad de pasar como parámetro al entrenar el orden de Markovización Horizontal
+para la UPCFG del ejercicio 3.
+
+### Para entrenar:
+
+```
+tagging/scripts/train.py -m upcfg -n <n> -o <file>
+```
+* -n: Orden de Markovización Horizontal.
+* -o: Archivo de salida con el Tagger.
+
+### Para evaluar:
+
+```
+tagging/scripts/eval.py -i <file>
+```
+
+Se evaluan las mismas sentencias que en el ejercicio 3 con distintos valores de orden.
+
+### Resultados:
+
+#### UPCFG - Orden de Markovización Horizontal: 0
+
+* Labeled
+  * Precision: 70.25% 
+  * Recall: 70.02% 
+  * F1: 70.14% 
+* Unlabeled
+  * Precision: 72.11% 
+  * Recall: 71.88% 
+  * F1: 72.00% 
+
+#### UPCFG - Orden de Markovización Horizontal: 1
+
+* Labeled
+  * Precision: 74.71% 
+  * Recall: 74.62% 
+  * F1: 74.66% 
+* Unlabeled
+  * Precision: 76.58% 
+  * Recall: 76.48% 
+  * F1: 76.53% 
+
+#### UPCFG - Orden de Markovización Horizontal: 2
+
+* Labeled
+  * Precision: 74.78% 
+  * Recall: 74.26% 
+  * F1: 74.52% 
+* Unlabeled
+  * Precision: 76.70% 
+  * Recall: 76.17% 
+  * F1: 76.43%
+
+#### UPCFG - Orden de Markovización Horizontal: 3
+
+* Labeled
+  * Precision: 74.01% 
+  * Recall: 73.37% 
+  * F1: 73.69% 
+* Unlabeled
+  * Precision: 76.17% 
+  * Recall: 75.51% 
+  * F1: 75.84%
