@@ -71,6 +71,43 @@ Ejercicio 2)
 Implementación de un CKY Parser. El cual dada una CFG en Chomsky Normal Form
 devuelve el parseo de mayor probabilidad para una oración del lenguaje.
 
+### Test de ambiguedad:
+
+Realice un test de ambiguedad para ver que el parser resolviera correctamente 
+los casos de ambiguedad.
+
+Dada la siguiente PCFG:
+
+| Producciones    | Probs. |
+|-----------------|--------|
+|VP -> Vt NP      | [0.75] |
+|VP -> VP PP      | [0.25] |
+|NP -> DT NN      | [0.8]  |
+|NP -> NP PP      | [0.2]  |
+|PP -> IN NP      | [1.0]  |
+|Vt -> 'saw'      | [1.0]  |
+|NN -> 'telescope'| [0.2]  |
+|NN -> 'dog'      | [0.8]  |
+|DT -> 'the'      | [1.0]  |
+|IN -> 'with'     | [1.0]  |
+
+Se analiza y resuelve correctamente entre las dos siguientes posibilidades:
+
+#### Arbol 1
+
+![T1](https://github.com/DiegoPiloni/PLN-2015/raw/practico3/parsing/Images/t1 "Arbol 1")
+
+#### Arbol 2
+
+![T2](https://github.com/DiegoPiloni/PLN-2015/raw/practico3/parsing/Images/t2 "Arbol 2")
+
+Donde se elige el Arbol 1, ya que es el que tiene mayor probabilidad con respecto a la gramática dada.
+Notar que solo difieren en el uso de una producción:
+
+En el arbol 1 se utiliza: VP -> VP PP, con probabilidad 0.25
+
+Mientras en el arbol 2 se utiliza: NP -> NP PP, con probabilidad 0.2
+
 Ejercicio 3)
 ------------
 
