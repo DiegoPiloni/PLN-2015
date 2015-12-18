@@ -14,9 +14,7 @@ from docopt import docopt
 import pickle
 import sys
 
-from corpus.ancora import SimpleAncoraCorpusReader
-
-from parsing.util import spans
+from corpus.ancora_dep import SimpleAncoraDepCorpusReader
 
 
 def progress(msg, width=None):
@@ -30,72 +28,67 @@ def progress(msg, width=None):
 if __name__ == '__main__':
     opts = docopt(__doc__)
 
-    print('Loading model...')
+    # load the model
     filename = opts['-i']
     f = open(filename, 'rb')
     model = pickle.load(f)
     f.close()
 
-    print('Loading corpus...')
-    files = '3LB-CAST/.*\.tbf\.xml'
-    corpus = SimpleAncoraCorpusReader('ancora/ancora-2.0/', files)
-    parsed_sents = list(corpus.parsed_sents())
+    # load the data
+    files = ["3LB-CAST/*.csv"]
+    corpus = SimpleAncoraDepCorpusReader('ancora/ancora-dep-2.0/', files)
+    sents = corpus.parsed_sents()
 
-    # check -n option
-    if opts['-n'] is not None:
-        n = int(opts['-n'])
-        parsed_sents = parsed_sents[:n]
+    # Accuracies
+    hits, total, acc = 0, 0, 0
 
-    # check -m option
-    if opts['-m'] is not None:
-        m = int(opts['-m'])
-        parsed_sents = [ps for ps in parsed_sents if len(ps.leaves()) <= m]
+    n = len(sents)
 
-    n = len(parsed_sents)
+    for i, sent in enumerate(sents):
+        word_sent, _, pos_sent, gold_dep_sent = zip(*sent)
 
-    print('Parsing...')
-    lab_hits, unlab_hits, total_gold, total_model = 0, 0, 0, 0
-    format_str = '{:3.1f}% ({}/{}) (LP={:2.2f}%, LR={:2.2f}%, LF1={:2.2f}%) (ULP={:2.2f}%, ULR={:2.2f}%, ULF1={:2.2f}%)'
-    progress(format_str.format(0.0, 0, n, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0))
-    for i, gold_parsed_sent in enumerate(parsed_sents):
-        tagged_sent = gold_parsed_sent.pos()
+        word_pos_sent = list(zip(word_sent, pos_sent))
 
-        # parse
-        model_parsed_sent = model.parse(tagged_sent)
+        model_actions_sent = model.actions(word_pos_sent)
 
-        # compute labeled scores
-        lab_gold_spans = spans(gold_parsed_sent, unary=False)
-        lab_model_spans = spans(model_parsed_sent, unary=False)
-        lab_hits += len(lab_gold_spans & lab_model_spans)
+        # construct dependency tree from actions
+        model_dep_sent = ["0"] * len(word_sent)
 
-        # compute unlabeled scores
-        unlab_gold_spans = set([s[1:] for s in lab_gold_spans])
-        unlab_model_spans = set([s[1:] for s in lab_model_spans])
-        unlab_hits += len(unlab_gold_spans & unlab_model_spans)
+        ROOT = ["0", "ROOT"]
+        stack = [ROOT]
+        buf = [[str(i+1), w] for i, w, in enumerate(word_sent)]
 
-        # total spans
-        total_gold += len(lab_gold_spans)
-        total_model += len(lab_model_spans)
+        for action in model_actions_sent:
+            if action == "SHIFT":
+                top_of_buffer = buf[0]
+                buf = buf[1:]
+                stack = stack + [top_of_buffer]
+            elif action == "REDUCE":
+                stack = stack[:-1]
+            elif action == "LEFT ARC":
+                top_of_buffer = buf[0]
+                wi = top_of_buffer[0]
+                wj = stack[-1][0]
+                model_dep_sent[int(wj)-1] = wi
+                stack = stack[:-1]
+            elif action == "RIGHT ARC":
+                top_of_buffer = buf[0]
+                wj = top_of_buffer[0]
+                wi = stack[-1][0]
+                model_dep_sent[int(wj)-1] = wi
+                buf = buf[1:]
+                stack = stack + [top_of_buffer]
 
-        # compute labeled partial results
-        lab_prec = float(lab_hits) / total_model * 100
-        lab_rec = float(lab_hits) / total_gold * 100
-        lab_f1 = 2 * lab_prec * lab_rec / (lab_prec + lab_rec)
+        assert len(model_dep_sent) == len(gold_dep_sent)
 
-        # compute unlabeled partial results
-        unlab_prec = float(unlab_hits) / total_model * 100
-        unlab_rec = float(unlab_hits) / total_gold * 100
-        unlab_f1 = 2 * unlab_prec * unlab_rec / (unlab_prec + unlab_rec)
+        model_gold_ts = list(zip(model_dep_sent, gold_dep_sent))
+        # global score
+        hits_sent = [m == g for m, g in model_gold_ts]
+        hits += sum(hits_sent)
+        total += len(sent)
+        acc = float(hits) / total
 
-        progress(format_str.format(float(i+1) * 100 / n, i+1, n, lab_prec, lab_rec, lab_f1, unlab_prec, unlab_rec, unlab_f1))
+        progress('{:3.1f}% (Global: {:2.2f}%) '.format(float(i) * 100 / n, acc * 100))
 
-    print('')
-    print('Parsed {} sentences'.format(n))
-    print('Labeled')
-    print('  Precision: {:2.2f}% '.format(lab_prec))
-    print('  Recall: {:2.2f}% '.format(lab_rec))
-    print('  F1: {:2.2f}% '.format(lab_f1))
-    print('Unlabeled')
-    print('  Precision: {:2.2f}% '.format(unlab_prec))
-    print('  Recall: {:2.2f}% '.format(unlab_rec))
-    print('  F1: {:2.2f}% '.format(unlab_f1))
+    # Accuracies
+    print('\nGlobal Accuracy: {:2.2f}%'.format(acc * 100))

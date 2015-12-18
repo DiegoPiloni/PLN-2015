@@ -1,217 +1,121 @@
-Práctico 3 - PLN 2015
+Práctico 4 - PLN 2015
 =====================
 
-Ejercicio 1)
-------------
-
-Implementación de un evaluador de parsers donde se calcula tanto Labeled como Unlabeled Precision, 
-Recall y F1.
-
-### Para entrenar:
-
-```
-tagging/scripts/train.py -m <model> -o <file>
-```
-
-* -m: Model to use:
-  * flat: Flat trees
-  * rbranch: Right branching trees
-  * lbranch: Left branching trees
-
-* -o: Archivo de salida con el Tagger.
-
-### Para evaluar:
-
-```
-tagging/scripts/eval.py -i <file>
-```
+Implementación de un Parser de Dependencias Greedy Basado en Transiciones.
 
 
-### Resultados para Baseline Parsers:
+### Introducción
 
-Parsed 1444 sentences
+Se implementa un Parser de Dependencias, en particular, intentando imitar el modelo voraz
+propuesto por MaltParser y su algoritmo *Nivre arc-eager*. http://www.maltparser.org/
 
-#### Flat:
+El algoritmo se encarga de manipular en cada sentencia a parsear dos estructuras distintas, una pila, con palabras de la oración con posibles nuevas dependencias y un buffer, el cual posee las palabras de la oración todavía no analizadas. Con estas estructuras el algoritmo intenta predecir basandose en un Modelo basado en historias (History-based model for predicting the next parser action) cual de las cuatros posibles transiciones 4 posibles debe ser aplicada.
 
-* Labeled
-  * Precision: 99.93%
-  * Recall: 14.57%
-  * F1: 25.43%
-* Unlabeled
-  * Precision: 100.00%
-  * Recall: 14.58%
-  * F1: 25.45%
+Estas posibles acciones son:
+
+* **SHIFT**
+* **REDUCE**
+* **RIGHT ARC**
+* **LEFT ARC** 
+
+Siendo las ultimas dos aquellas que generan nuevas dependencias entre palabras de la oración.
+
+Lo que se intenta lograr en este trabajo es hacer una buena traducción entre Arboles de dependencias
+a secuencias de Historias y acciones, de manera que usando un clasificador, se pueda luego deducir acciones que sean nuevamente traducidas a Arboles de dependencia.
+
+En este trabajo solo se intentará generar dependencias no etiquetadas, quedando pendiente el trabajo
+de completar el parseo de dependencias etiquetado.
 
 
-#### RBranch:
+### Herramientas utilizadas en la implementación
 
-* Labeled
-  * Precision: 8.81%
-  * Recall: 14.57%
-  * F1: 10.98%
-* Unlabeled
-  * Precision: 8.87%
-  * Recall: 14.68%
-  * F1: 11.06%
+Se utlizan las siguientes librerias de python:
 
-#### LBranch:
+* *scikit-learn*: Provee los clasificadores SVM y LR, utilizados en este trabajo. 
+Además provee la posibilidad de generar un Pipeline el cual toma como argumentos un Vectorizer de features, y el clasificador, para entrenar y luego hacer la predicción de acciones.
 
-* Labeled
-  * Precision: 8.81%
-  * Recall: 14.57%
-  * F1: 10.98%
-* Unlabeled
-  * Precision: 14.71%
-  * Recall: 24.33%
-  * F1: 18.33%
+* *feature-forge*: Facilita la implementación de features y la creación del Vectorizer dado como argumento
+al Pipeline de scikit-learn.
 
-Ejercicio 2)
-------------
+* *csv*: De esta libreria se utiliza el metodo cvs_reader que se encarga de parsear los datos del corpus
+que se encuentran en formato .csv
 
-Implementación de un CKY Parser. El cual dada una CFG en Chomsky Normal Form
-devuelve el parseo de mayor probabilidad para una oración del lenguaje.
 
-### Test de ambiguedad:
-
-Realice un test de ambiguedad para ver que el parser resolviera correctamente 
-los casos de ambiguedad.
-
-Dada la siguiente PCFG:
-
-| Producciones    | Probs. |
-|-----------------|--------|
-|VP -> Vt NP      | [0.75] |
-|VP -> VP PP      | [0.25] |
-|NP -> DT NN      | [0.8]  |
-|NP -> NP PP      | [0.2]  |
-|PP -> IN NP      | [1.0]  |
-|Vt -> 'saw'      | [1.0]  |
-|NN -> 'telescope'| [0.2]  |
-|NN -> 'dog'      | [0.8]  |
-|DT -> 'the'      | [1.0]  |
-|IN -> 'with'     | [1.0]  |
-
-Se analiza y resuelve correctamente entre las dos siguientes posibilidades:
-
-#### Arbol 1
-
-![T1](https://github.com/DiegoPiloni/PLN-2015/raw/practico3/parsing/Images/t1 "Arbol 1")
-
-#### Arbol 2
-
-![T2](https://github.com/DiegoPiloni/PLN-2015/raw/practico3/parsing/Images/t2 "Arbol 2")
-
-Donde se elige el Arbol 1, ya que es el que tiene mayor probabilidad con respecto a la gramática dada.
-Notar que solo difieren en el uso de una producción:
-
-En el arbol 1 se utiliza: VP -> VP PP, con probabilidad 0.25
-
-Mientras en el arbol 2 se utiliza: NP -> NP PP, con probabilidad 0.2
-
-Ejercicio 3)
-------------
-
-Implementación de una UPCFG.
-Dado un corpus de parsed sents genera una CFG en Chosmky Normal Form.
-El parser utilizado es el CKY del Ejercicio 2.
-
-### Para entrenar:
+### Instrucciones para entrenar modelos:
 
 ```
-tagging/scripts/train.py -m upcfg -o <file>
+python parsing/scripts/train.py -c <classifier> -o <file>
 ```
 
-* -o: Archivo de salida con el Tagger.
+* -c: Clasificador a usar:
+  * svm: Support vector Machine
+  * lr: Logistic Regression
+* -o: Archivo de salida con el Parser.
 
-### Para evaluar:
 
-```
-tagging/scripts/eval.py -i <file>
-```
-
-### Resultados UPCFG:
-
-#### UPCFG
-
-* Labeled
-  * Precision: 73.16%
-  * Recall: 72.86%
-  * F1: 73.01%
-* Unlabeled
-  * Precision: 75.27%
-  * Recall: 74.96%
-  * F1: 75.12%
-
-##### Tiempo de evaluación
-
-* real  3m12.866s
-* user  3m12.289s
-* sys 0m0.572s
-
-Ejercicio 4)
-------------
-
-Posibilidad de pasar como parámetro al entrenar el orden de Markovización Horizontal
-para la UPCFG del ejercicio 3.
-
-### Para entrenar:
+### Instrucciones para evaluar los modelos entrenados:
 
 ```
-tagging/scripts/train.py -m upcfg -n <n> -o <file>
-```
-* -n: Orden de Markovización Horizontal.
-* -o: Archivo de salida con el Tagger.
-
-### Para evaluar:
-
-```
-tagging/scripts/eval.py -i <file>
+python parsing/scripts/eval.py -i <file>
 ```
 
-Se evaluan las mismas sentencias que en el ejercicio 3 con distintos valores de orden.
+* -i: Archivo con el modelo entrenado.
 
-### Resultados:
 
-#### UPCFG - Orden de Markovización Horizontal: 0
+### Resultados para experimentos realizados con la versión de dependencias del corpus Ancora:
 
-* Labeled
-  * Precision: 70.25% 
-  * Recall: 70.02% 
-  * F1: 70.14% 
-* Unlabeled
-  * Precision: 72.11% 
-  * Recall: 71.88% 
-  * F1: 72.00% 
+#### SVM:
 
-#### UPCFG - Orden de Markovización Horizontal: 1
+* Global Accuracy: 64.01%
 
-* Labeled
-  * Precision: 74.71% 
-  * Recall: 74.62% 
-  * F1: 74.66% 
-* Unlabeled
-  * Precision: 76.58% 
-  * Recall: 76.48% 
-  * F1: 76.53% 
+##### Tiempo de evaluación:
 
-#### UPCFG - Orden de Markovización Horizontal: 2
 
-* Labeled
-  * Precision: 74.78% 
-  * Recall: 74.26% 
-  * F1: 74.52% 
-* Unlabeled
-  * Precision: 76.70% 
-  * Recall: 76.17% 
-  * F1: 76.43%
+* real    0m34.912s
 
-#### UPCFG - Orden de Markovización Horizontal: 3
+* user    0m34.699s
 
-* Labeled
-  * Precision: 74.01% 
-  * Recall: 73.37% 
-  * F1: 73.69% 
-* Unlabeled
-  * Precision: 76.17% 
-  * Recall: 75.51% 
-  * F1: 75.84%
+* sys     0m0.212s
+
+
+#### Logistic Regression:
+
+* Global Accuracy: 64.24%
+
+##### Tiempo de evaluación:
+
+* real    0m33.316s
+
+* user    0m33.099s
+
+* sys     0m0.220s
+
+### Recursos utilizados:
+
+Se utiliza el corpus anotado Ancora.
+
+Utilizando las secciones:
+
+* *CESS-CAST-A*, *CESS-CAST-AA*, *CESS-CAST-P*, para entrenamiento.
+
+* *3LB-CAST*, para evaluación.
+
+
+#### Conclusión
+
+Se pueden apreciar algunas de las ventajas de los metodos data-driven, que es su relativamente bajo tiempo de desarrollo tanto como su gran eficiencia en velocidad de parseo con respecto a los metodos dinámicos, como el algoritmo CKY.
+
+Si bien los resultados obtenidos al experimentar no son tan buenos como se esperan, se cree fuertemente que con una mejor elección de features mejoraría notablemente la Accuracy obtenida.
+
+
+### Referencia principal utilizada en el trabajo:
+
+[Greedy Transition-Based Dependency Parsing - Stanford NLP Video Lectures by Dan Jurafsky, Christopher Manning](https://class.coursera.org/nlp/lecture/177)
+
+### Referencia adicional:
+
+* http://lrec-conf.org/proceedings/lrec2006/pdf/162_pdf.pdf
+
+* https://spacy.io/blog/parsing-english-in-python
+
+* http://www.maltparser.org/
