@@ -9,7 +9,7 @@ Implementación de un Parser de Dependencias Greedy Basado en Transiciones.
 Se implementa un Parser de Dependencias, en particular, intentando imitar el modelo voraz
 propuesto por MaltParser y su algoritmo *Nivre arc-eager*. http://www.maltparser.org/
 
-El algoritmo se encarga de manipular en cada sentencia a parsear dos estructuras distintas, una pila, con palabras de la oración con posibles nuevas dependencias y un buffer, el cual posee las palabras de la oración todavía no analizadas. Con estas estructuras el algoritmo intenta predecir basandose en un Modelo basado en historias (History-based model for predicting the next parser action) cual de las cuatros posibles transiciones 4 posibles debe ser aplicada.
+El algoritmo se encarga de manipular en cada sentencia a parsear dos estructuras distintas, una pila, con palabras de la oración con posibles nuevas dependencias y un buffer, el cual posee las palabras de la oración todavía no analizadas. Con estas estructuras el algoritmo intenta predecir usando un Modelo basado en historias (History-based model for predicting the next parser action) cual de las cuatros posibles transiciones 4 posibles debe ser aplicada.
 
 Estas posibles acciones son:
 
