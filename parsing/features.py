@@ -1,5 +1,7 @@
 from collections import namedtuple
 
+from featureforge.feature import Feature
+
 # stack -- The stack with words analized but maybe not fully related.
 # buffer -- Words not analized yet.
 History = namedtuple('History', 'stack buffer')
@@ -17,39 +19,75 @@ def distance(h):
     return int(i_buf) - int(i_stack)
 
 
-def top_of_stack_word(h):
-    """Feature: Top of stack word
+def top_word(h):
+    """Feature: pair(top_of_stack_word, top_of_buffer_word)
 
-    h -- a history."""
+    h -- a history"""
     stack = h.stack
+    buf = h.buffer
     if stack:
-        return stack[-1][1].lower()
+        return (stack[-1][1], buf[0][1])
     else:
-        return "ES"
+        return (" ", buf[0][1])
 
 
-def top_of_stack_pos(h):
-    """Feature: Top of stack pos
+def top_pos(h):
+    """Feature: pair(top_of_stack_pos, top_of_buffer_pos)
 
-    h -- a history."""
+    h -- a history"""
     stack = h.stack
+    buf = h.buffer
     if stack:
-        return stack[-1][2]
+        return (stack[-1][2], buf[0][2])
     else:
-        return "ES"
+        return (" ", buf[0][2])
 
 
-def top_of_buf_word(h):
-    """Feature: Top of buffer word
+class TopNWordsOfStack(Feature):
+    def __init__(self, n):
+        self.n = n
 
-    h -- a history."""
-    buf = h.buffer
-    return buf[0][1].lower()
+    def _evaluate(self, h):
+        n = self.n
+        stack = h.stack
+        if stack:
+            topn = stack[-n:]
+            return [l[1].lower() for l in topn]
+        else:
+            return []
 
 
-def top_of_buf_pos(h):
-    """Feature: Top of buffer word
+class TopNPosOfStack(Feature):
+    def __init__(self, n):
+        self.n = n
 
-    h -- a history."""
-    buf = h.buffer
-    return buf[0][2]
+    def _evaluate(self, h):
+        n = self.n
+        stack = h.stack
+        if stack:
+            topn = stack[-n:]
+            return [l[2] for l in topn]
+        else:
+            return []
+
+
+class TopNWordsOfBuf(Feature):
+    def __init__(self, n):
+        self.n = n
+
+    def _evaluate(self, h):
+        n = self.n
+        buf = h.buffer
+        topn = buf[:n]
+        return [l[1].lower() for l in topn]
+
+
+class TopNPosOfBuf(Feature):
+    def __init__(self, n):
+        self.n = n
+
+    def _evaluate(self, h):
+        n = self.n
+        buf = h.buffer
+        topn = buf[:n]
+        return [l[2] for l in topn]

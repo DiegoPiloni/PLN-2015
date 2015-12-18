@@ -66,27 +66,25 @@ python parsing/scripts/eval.py -i <file>
 
 #### SVM:
 
-* Global Accuracy: 64.01%
+* Global Accuracy: 69.00%
 
 ##### Tiempo de evaluación:
 
+* real     1m5.639s
 
-* real    0m34.912s
+* user     0m57.560s
 
-* user    0m34.699s
-
-* sys     0m0.212s
-
+* sys      0m0.212s
 
 #### Logistic Regression:
 
-* Global Accuracy: 64.24%
+* Global Accuracy: 70.57%
 
 ##### Tiempo de evaluación:
 
-* real    0m33.316s
+* real    0m56.774s
 
-* user    0m33.099s
+* user    0m56.209s
 
 * sys     0m0.220s
 
@@ -96,9 +94,9 @@ Se utiliza el corpus anotado Ancora.
 
 Utilizando las secciones:
 
-* *CESS-CAST-A*, *CESS-CAST-AA*, *CESS-CAST-P*, para entrenamiento.
+* *CESS-CAST-A*, *CESS-CAST-AA*, *CESS-CAST-P*, para entrenamiento. (13884 sentencias)
 
-* *3LB-CAST*, para evaluación.
+* *3LB-CAST*, para evaluación. (3492 sentencias)
 
 
 #### Conclusión

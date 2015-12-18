@@ -2,9 +2,8 @@ from featureforge.vectorizer import Vectorizer
 from sklearn.linear_model import LogisticRegression
 from sklearn.svm import LinearSVC
 from sklearn.pipeline import Pipeline
-from parsing.features import (History, distance, top_of_stack_word,
-                              top_of_stack_pos, top_of_buf_word,
-                              top_of_buf_pos)
+from parsing.features import (History, distance, top_pos, top_word, TopNWordsOfStack,
+                              TopNPosOfStack, TopNWordsOfBuf, TopNPosOfBuf)
 
 
 class TBDependencyParser():
@@ -22,8 +21,13 @@ class TBDependencyParser():
                        'svm': LinearSVC()}
 
         # Features
-        self.features = [distance, top_of_stack_word, top_of_stack_pos,
-                         top_of_buf_word, top_of_buf_pos]
+
+        self.features = [distance, top_pos, top_word]
+        n = 2  # Best Accuracy found
+        self.features += [TopNWordsOfStack(i) for i in range(1, n+1)]
+        self.features += [TopNPosOfStack(i) for i in range(1, n+1)]
+        self.features += [TopNWordsOfBuf(i) for i in range(1, n+1)]
+        self.features += [TopNPosOfBuf(i) for i in range(1, n+1)]
 
         # Pipeline for tag classifier
         self.action_clf = Pipeline([('vect', Vectorizer(self.features)),
