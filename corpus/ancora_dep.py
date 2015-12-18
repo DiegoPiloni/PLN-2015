@@ -2,9 +2,9 @@ import csv
 import glob
 import os
 
+
 class SimpleAncoraDepCorpusReader():
-    """Ancora dependencycorpus with simplified POS tagset.
-    """
+    """Ancora dependency corpus with simplified POS tagset."""
     # FIX: NOT LAZY #
 
     def __init__(self, path, files=None):
@@ -14,10 +14,11 @@ class SimpleAncoraDepCorpusReader():
         for fs in files:
             for f in glob.glob(os.path.join(path, fs)):
                 with open(f, newline='') as csvfile:
-                    self.csvreaders.append(list(csv.reader(csvfile, delimiter=' ', quotechar='|')))
+                    self.csvreaders.append(list(csv.reader(csvfile,
+                                           delimiter=' ', quotechar='|')))
 
     def parsed_sents(self):
-        """Return the parsed sents of the corpus"""
+        """Return simplified parsed sents of the corpus"""
         parsed_sents = list()
         for reader in self.csvreaders:
             new_sent = list()

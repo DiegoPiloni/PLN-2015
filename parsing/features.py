@@ -1,7 +1,5 @@
 from collections import namedtuple
 
-from featureforge.feature import Feature
-
 # stack -- The stack with words analized but maybe not fully related.
 # buffer -- Words not analized yet.
 History = namedtuple('History', 'stack buffer')
@@ -18,6 +16,7 @@ def distance(h):
         i_stack = stack[-1][0]
     return int(i_buf) - int(i_stack)
 
+
 def top_of_stack_word(h):
     """Feature: Top of stack word
 
@@ -27,6 +26,7 @@ def top_of_stack_word(h):
         return stack[-1][1].lower()
     else:
         return "ES"
+
 
 def top_of_stack_pos(h):
     """Feature: Top of stack pos
@@ -38,12 +38,14 @@ def top_of_stack_pos(h):
     else:
         return "ES"
 
+
 def top_of_buf_word(h):
     """Feature: Top of buffer word
 
     h -- a history."""
     buf = h.buffer
     return buf[0][1].lower()
+
 
 def top_of_buf_pos(h):
     """Feature: Top of buffer word

@@ -88,7 +88,7 @@ if __name__ == '__main__':
         total += len(sent)
         acc = float(hits) / total
 
-        progress('{:3.1f}% (Global: {:2.2f}%) '.format(float(i) * 100 / n, acc * 100))
+        progress('{:3.1f}% (Global: {:2.2f}%)'.format(float(i)*100/n, acc*100))
 
     # Accuracies
     print('\nGlobal Accuracy: {:2.2f}%'.format(acc * 100))
