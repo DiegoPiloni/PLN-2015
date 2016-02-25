@@ -66,7 +66,7 @@ class TBDependencyParser():
         actions = list()
 
         while hist_buf:
-            if len(hist_stack) > 1:
+            if len(hist_stack) >= 1:
                 if complete_buf[0][4] == complete_stack[-1][0]:
                     hs.append(History(hist_stack, hist_buf))
                     actions.append("RIGHT ARC")
